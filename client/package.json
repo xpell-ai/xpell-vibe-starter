@@ -1,0 +1,23 @@
+{
+  "name": "xpell-vibe-starter-client",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@xpell/ui": "workspace:*",
+    "@xpell/xdashboard": "0.1.0-alpha.1"
+  },
+  "peerDependencies": {
+    "@xpell/core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.3.2"
+  }
+}

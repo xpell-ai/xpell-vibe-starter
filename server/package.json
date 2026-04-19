@@ -1,0 +1,20 @@
+{
+  "name": "xpell-vibe-starter-server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "start": "node dist/main.js",
+    "dev": "tsc -w & node dist/main.js"
+  },
+  "dependencies": {
+    "@xpell/node": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies" :{
+    "@xpell/core": "workspace:*"
+  }
+}
