@@ -6,10 +6,11 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "node dist/main.js",
-    "dev": "tsc -w & node dist/main.js"
+    "dev": "tsc -p . && node dist/main.js"
   },
   "dependencies": {
-    "@xpell/node": "workspace:*"
+    "@xpell/node": "workspace:*",
+    "@xpell/xai-providers": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

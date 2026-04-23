@@ -1,6 +1,8 @@
 import path from "node:path";
 
-import { _x, _xlog, XNode, XDB, XDBStorageFS } from "@xpell/node";
+import { _x, _xlog, XNode, XDB, XDBStorageFS, _xai } from "@xpell/node";
+import { MockProvider } from "@xpell/xai-providers/mock";
+import { AzureProvider } from "@xpell/xai-providers/azure";
 
 import { VibeModule } from "./modules/vibe/VibeModule.js";
 
@@ -65,12 +67,14 @@ async function bootstrap_default_app() {
 
 async function main() {
   try {
+    _x._verbose = true;
     _x.start();
 
     XDB.init({ storage: create_xdb_storage() });
     _x.loadModule(XDB);
 
     _x.loadModule(new VibeModule());
+
 
     const node = new XNode();
 
@@ -84,6 +88,20 @@ async function main() {
     });
 
     await bootstrap_default_app();
+    _xai.registerProvider(
+      "azure",
+      new AzureProvider({
+        endpoint: process.env.AZURE_OPENAI_ENDPOINT!,
+        apiKey: process.env.AZURE_OPENAI_API_KEY!,
+        deployment: process.env.AZURE_OPENAI_DEPLOYMENT!,
+      })
+    );
+
+    await _x.execute({
+      _module: "xai",
+      _op: "set_default",
+      _params: { _provider: "azure" },
+    });
 
     _xlog.log("[vibe-server] ready");
 
