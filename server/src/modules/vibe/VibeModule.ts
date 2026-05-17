@@ -144,6 +144,10 @@ export class VibeModule extends XModule {
     this._service = new VibeService();
   }
 
+  async onLoad()  {
+    _xlog.log("[vibe] module loaded**********************");
+  }
+
   async _op_generate_view(xcmd: XCommand): Promise<VibeGenerateViewResult> {
     try {
       const _params = this.parse_generate_view_params(xcmd?._params);

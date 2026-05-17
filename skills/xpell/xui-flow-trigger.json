@@ -1,0 +1,192 @@
+{
+  "_id": "xui-flow-trigger",
+  "_title": "XUI Flow Trigger Rules",
+  "_version": "1.0.0",
+  "_active": true,
+  "_type": "view-skill",
+  "_description": "Rules for triggering FlowManager flows from XUI objects using root-level _flow and optional _flow_event.",
+  "_applies_to": ["@xpell/ui", "xui", "flow-trigger", "flow-manager", "vibe-ai"],
+
+  "_requires": ["xui-core", "xfm-flow"],
+
+  "_match": {
+    "_keywords": ["flow", "trigger", "_flow", "_flow_event", "_payload", "button", "click", "run flow", "execute flow"],
+    "_requires_any": ["flow", "trigger", "run", "execute", "button", "click", "submit", "load"],
+    "_exclude_keywords": ["react", "vue", "angular"],
+    "_priority": 350
+  },
+
+  "_core_rules": [
+    "Return ONLY valid JSON.",
+    "Use root-level _flow on XUI objects to trigger FlowManager flows.",
+    "Do NOT use _on.click._op:\"fire\" to run FlowManager flows.",
+    "Use _on/_op:\"fire\" only for raw XEM events.",
+    "_flow default trigger event is click.",
+    "Use _flow_event to change the trigger event.",
+    "_flow can be a string flow id or an object with _id and _payload.",
+    "_payload values are passed to the flow event payload.",
+    "Do NOT set _flow_auto:false unless explicitly requested.",
+    "Do NOT nest _flow under _on, _on.click, or any event handler.",
+    "Do NOT generate JavaScript handlers, DOM onclick, addEventListener, React, or Vue syntax."
+  ],
+
+  "_priority_rules": [
+    "_flow ALWAYS overrides _on.click for FlowManager execution.",
+    "When generating flow-triggering buttons, NEVER generate _on.click._op:\"fire\".",
+    "If a button runs a flow, use root-level _flow only.",
+    "Do NOT combine _flow with _on.click fire patterns.",
+    "Do NOT generate _flow_auto:false unless the user explicitly asks to disable automatic flow binding.",
+    "fire nano command is for raw XEM events, not FlowManager flows.",
+    "For click-triggered flows, omit _flow_event unless a non-click event is required.",
+    "For input/change-triggered flows, set _flow_event:\"change\" or another explicit event.",
+    "When passing UI event values to a flow, use _flow as an object with _id and _payload."
+  ],
+
+  "_fields": {
+    "_flow": "Root-level XUIObject field. Runs a FlowManager flow. Can be a string flow id or an object with _id and _payload.",
+    "_flow_event": "Optional root-level field. DOM event name used to trigger the flow. Defaults to click.",
+    "_flow_auto": "Optional root-level field. Set false to prevent automatic flow binding.",
+    "_payload": "When _flow is an object, _payload defines values passed to the flow event payload."
+  },
+
+  "_exports": {
+    "_xui_fields": [
+      "_flow",
+      "_flow_event",
+      "_flow_auto"
+    ],
+    "_response_shapes": [
+      {
+        "_name": "flow_trigger_string",
+        "_shape": {
+          "_type": "button",
+          "_text": "Run",
+          "_flow": "flow-id"
+        }
+      },
+      {
+        "_name": "flow_trigger_with_payload",
+        "_shape": {
+          "_type": "button",
+          "_text": "Run",
+          "_flow": {
+            "_id": "flow-id",
+            "_payload": {}
+          }
+        }
+      }
+    ]
+  },
+
+  "_patterns": [
+    {
+      "_name": "button_runs_flow",
+      "_description": "Button click runs a flow.",
+      "_example": {
+        "_type": "button",
+        "_id": "btn-get-users",
+        "_text": "Get Users",
+        "_flow": "flow-get-users"
+      }
+    },
+    {
+      "_name": "input_change_runs_flow",
+      "_description": "Input change runs a flow and passes event value.",
+      "_example": {
+        "_type": "input",
+        "_id": "search-users",
+        "placeholder": "Search users",
+        "_flow_event": "change",
+        "_flow": {
+          "_id": "flow-search-users",
+          "_payload": {
+            "query": "$event.value"
+          }
+        }
+      }
+    },
+    {
+      "_name": "button_runs_flow_with_payload",
+      "_description": "Button click runs a flow with static or dynamic payload.",
+      "_example": {
+        "_type": "button",
+        "_id": "btn-load-entity",
+        "_text": "Load Entity",
+        "_flow": {
+          "_id": "flow-load-entity",
+          "_payload": {
+            "_entity": "users"
+          }
+        }
+      }
+    }
+  ],
+
+  "_canonical_examples": [
+    {
+      "_view": {
+        "_id": "main",
+        "_type": "view",
+        "_children": [
+          {
+            "_type": "button",
+            "_id": "btn-get-users",
+            "_text": "Get Users",
+            "_flow": "flow-get-users"
+          }
+        ]
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    {
+      "_bad": {
+        "_type": "button",
+        "_text": "Get Users",
+        "_on": {
+          "click": {
+            "_op": "fire",
+            "_params": {
+              "event": "flow-get-users"
+            }
+          }
+        }
+      },
+      "_reason": "This fires a raw XEM event. FlowManager flows must use root-level _flow."
+    },
+    {
+      "_bad": {
+        "_type": "button",
+        "_text": "Get Users",
+        "_on": {
+          "click": {
+            "_flow": "flow-get-users"
+          }
+        }
+      },
+      "_reason": "_flow is a root-level XUIObject field, not nested under _on.click."
+    },
+    {
+      "_bad": {
+        "_flow": {
+          "_id": "flow-get-users",
+          "_steps": []
+        }
+      },
+      "_reason": "This is a flow definition shape. XUI flow triggers should reference a flow id or use _flow._id with _payload."
+    },
+    "onclick",
+    "addEventListener",
+    "JavaScript functions",
+    "React event syntax",
+    "Vue event syntax"
+  ],
+
+  "_notes": [
+    "Flow definitions belong to xfm-flow.",
+    "XUI objects trigger flows through root-level _flow.",
+    "Do not use _on.click.fire for FlowManager flows.",
+    "Use _on.click.fire only for raw XEM signals."
+  ]
+}

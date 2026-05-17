@@ -2,8 +2,8 @@
 name: Xpell Node (xnode) Contract
 id: xpell-node
 version: 2.0.0
-updated: 2026-02-26
-description: Deterministic server runtime for Xpell 2. Provides module system integration,Wormholes v2 transport gateways, XDB persistence layer, and XSettings file-backed configuration.
+updated: 2026-05-01
+description: Deterministic server runtime for Xpell 2. Provides module system integration, Wormholes v2 transport gateways, XDB persistence, ServerXVM apps/flows, XAI provider wiring, flow execution, and XSettings file-backed configuration.
 requires:
   - xpell-contract
   - xpell-core
@@ -12,12 +12,15 @@ requires:
 ## 1) Applies to / Scope
 - Applies to `@xpell/node` runtime code under `src/`.
 - Applies to bootstrap (`XNode`, `XWebServer`), Wormholes transport, XDB persistence, and XSettings.
+- Applies to ServerXVM persisted apps/views/flows, XAI provider wiring, and FlowManager execution.
 - Applies to host applications that import public API from package entrypoint (`src/index.ts` -> `dist/index.js`).
+- Keep this file as the compact contract. Load `SKILL_API_MAP.md` only for exact exports/API names, and `SKILL_CHECKLIST.md` only before merge/review.
 
 ## 2) Core identity (what xnode is and is not)
 - xnode is a server runtime library built on `@xpell/core`.
 - xnode provides ready-to-run HTTP/HTTPS bootstrap helpers (`XWebServer`, `XNode`).
 - xnode also exposes transport primitives (`createWormholesRestRouter`, `createWormholesWSServer`) for host-owned servers.
+- xnode includes server-side app/view/flow persistence (`ServerXVMModule`), AI provider dispatch (`XAI`), and flow execution (`FlowManagerModule`, boot-loaded but not exported).
 - xnode is not a UI runtime and does not expose DOM/browser APIs.
 - xnode does not persist through XData; persistence is explicit in file/SQLite stores.
 
@@ -42,6 +45,7 @@ requires:
   - Node utilities/events: `XUtils`/`_xu`, `XEventManager`/`_xem`.
   - Settings export alias: `Settings` (aliased from internal `XSettings` singleton).
   - Server helpers: `XWebServer`, `XNode`, `ServerXVMModule`.
+  - XAI helpers: `XAIModule`, `XAI`, `_xai`, `XAIRegistry`, and XAI provider types.
   - XDB API: `XDB`, `XDBStorageFS`, `XDBStorageSqlite`, `XDBEngine`, entity/file/vector/temp/cache types.
   - Wormholes API via `export * from "./Wormholes/wh.index.js"`.
 
@@ -77,7 +81,7 @@ requires:
 - Gateway execution flow:
   - `handleEnvelope(env, ctx, opts)` is transport-agnostic.
   - `REQ` payload must be `{ _module, _op, _params? }`.
-  - Gateway injects server metadata into `_params`: `_wid`, `_sid`, `_from`, `_to`.
+  - Gateway injects server metadata into `_params`: `_wid`, `_sid`, `_from`, `_to`, sanitized `_auth`, and attaches `_ctx` to the command object.
   - Gateway routes REQ to `_x.execute(cmd)`.
   - Response is `RES` with `_rid` equal to request `_id`.
 - REST transport:
@@ -88,6 +92,7 @@ requires:
   - `createWormholesWSServer(server, opts)` defaults to path `/wh/v2`.
   - Sends `HELLO` on connection.
   - Parses inbound envelopes and delegates to `handleEnvelope`.
+  - Maintains a connection registry and exposes scoped push helpers (`wsSetScope`, `wsSendToWid`, `wsBroadcastScoped`, `wsBroadcastAll`, etc.).
 
 ### Auth policy (production vs dev)
 - Production policy: `_require_auth` MUST be `true` for REST and WS gateways.
@@ -132,7 +137,9 @@ requires:
   - apply optional web overrides/routes
   - `XWebServer.load()` + `XWebServer.start()`
   - load `PingModule`
+  - load singleton `XAI`
   - load `ServerXVMModule` and call `init_on_boot()` when present
+  - load `FlowManagerModule` (`_name: "flow"`)
 - `XDB` is not auto-loaded by `XNode`; host must initialize and load it explicitly.
 
 ## 9) Persistence rules
@@ -140,7 +147,7 @@ requires:
 - Persistent stores in current code:
   - XSettings JSON file.
   - XDB FS/SQLite storage layers.
-  - ServerXVM persisted apps/views under `<work_folder>/xvm/apps/<env>/<app_id>/`.
+  - ServerXVM persisted apps/views/flows under `<work_folder>/xvm/apps/<env>/<app_id>/`.
 - Writes are synchronous file writes in several components (`XSettings`, `XWebServer` setup copy, ServerXVM persistence, FS adapter writes).
 - No hidden persistence mirror to `_xd` is implemented in xnode runtime code.
 
@@ -152,7 +159,9 @@ requires:
 - Do not add UI/DOM/browser logic to xnode runtime modules.
 - Do not introduce hidden background control loops in modules (`setInterval`/`setTimeout` polling patterns).
 - Do not persist function values in ServerXVM app/view JSON.
+- Do not persist function values in ServerXVM flow JSON.
 - Do not allow unrestricted risky nano-ops (`open-url`, `navigate`) outside policy checks.
+- FlowManager may use `_xd` for transient step input/output only; do not treat it as persistent state.
 
 ## 11) Error handling contract
 - Wormholes protocol/gateway errors are represented with `XError`-based codes (`E_WH_*`).
@@ -171,7 +180,8 @@ requires:
   - server start/setup messages
   - Wormholes connect/disconnect/errors
   - XDB commit/load/storage errors
-  - ServerXVM boot/validation and push updates
+  - ServerXVM boot/persistence and push updates
+  - FlowManager debug logs only when `_debug === true`
 - No built-in redaction layer is present in xnode. Callers must avoid logging secrets/tokens.
 - Optional verbose transport message logging exists (`WH/WS` message slices when `_log_messages: true`).
 

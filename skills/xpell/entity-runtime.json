@@ -1,0 +1,368 @@
+{
+  "_id": "entity-runtime",
+  "_title": "Xpell Entity Runtime Rules",
+  "_version": "1.0.0",
+  "_active": true,
+  "_type": "runtime-api-skill",
+  "_description": "Rules for declarative Xpell entity runtime operations using entity-manager, entity-client, XResponse shapes, XData reactive state, and entity sync/cache boundaries.",
+  "_applies_to": ["vibe-ai", "xdb", "entity-runtime", "entity-manager", "entity-client", "xdb-sync-manager"],
+
+  "_requires": ["xpell-contract", "xpell-core", "xdb-entity"],
+
+  "_match": {
+    "_keywords": ["entity-runtime", "entity-manager", "entity-client", "xdb-sync-manager", "find", "add", "update", "delete", "sync_entity", "get_local"],
+    "_requires_any": ["entity", "runtime", "crud", "find", "add", "update", "delete", "sync", "records"],
+    "_exclude_keywords": ["react", "vue", "sql"],
+    "_priority": 290
+  },
+
+  "_core_rules": [
+    "Return ONLY valid JSON.",
+    "Use entity-manager on the server side.",
+    "Use entity-client on the client side.",
+    "Entity runtime operations are declarative command JSON.",
+    "Always use explicit _entity names.",
+    "Use _filter for queries.",
+    "Use _data for create/add operations.",
+    "Use _updates for update operations.",
+    "Use explicit _app_id and _env in server/runtime flows.",
+    "Do NOT generate MongoDB syntax directly.",
+    "Do NOT generate SQL.",
+    "Do NOT generate raw fetch calls.",
+    "Do NOT generate ORM code.",
+    "Entity responses follow XResponse protocol.",
+    "_result._records._data contains entity arrays for find responses.",
+    "_result._record contains a single entity record for add/update responses when returned.",
+    "Server XDB is authoritative.",
+    "XDBSyncManager is local cache sync only.",
+    "Local cache is not authoritative persistence.",
+    "Entity mutations may emit XEM events.",
+    "Use XData for reactive UI state."
+  ],
+
+  "_priority_rules": [
+    "For server authoritative CRUD, use entity-manager.",
+    "Inside server FlowManager flows, use entity-manager, not entity-client.",
+    "For client-side runtime CRUD/sync, use entity-client.",
+    "For client local cache reads, use entity-client get_local.",
+    "For client sync, use entity-client sync_entity.",
+    "For find/query, always use _filter.",
+    "For add/create, always use _data.",
+    "For update, always use _filter and _updates.",
+    "Do not use filter, data, or updates without underscore.",
+    "Do not bypass entity-manager/entity-client with fetch, axios, ORM, SQL, or raw database calls.",
+    "When used inside FlowManager, place entity commands under step._command."
+  ],
+
+  "_fields": {
+    "_modules": {
+      "entity-manager": {
+        "_scope": "server",
+        "_purpose": "Authoritative entity CRUD operations."
+      },
+      "entity-client": {
+        "_scope": "client",
+        "_purpose": "Client-side entity CRUD, sync, and cache helper."
+      },
+      "xdb-sync-manager": {
+        "_scope": "client",
+        "_purpose": "Sync local cache with server entity-manager."
+      }
+    },
+    "_canonical_operations": [
+      "find",
+      "add",
+      "update",
+      "delete",
+      "sync_entity",
+      "get_local"
+    ],
+    "_params": {
+      "_app_id": "Application id.",
+      "_env": "Environment id.",
+      "_entity": "Entity name.",
+      "_filter": "Query filter.",
+      "_data": "Create/add payload.",
+      "_updates": "Update payload."
+    },
+    "_response_paths": [
+      "$step.find-users._result._records._data",
+      "$step.add-user._result._record",
+      "$step.update-user._result._updated",
+      "$step.delete-user._result._deleted"
+    ],
+    "_event_patterns": [
+      {
+        "_event": "xdb:create",
+        "_description": "Entity record created."
+      },
+      {
+        "_event": "xdb:update",
+        "_description": "Entity record updated."
+      },
+      {
+        "_event": "xdb:delete",
+        "_description": "Entity record deleted."
+      },
+      {
+        "_event": "xdb-local-created",
+        "_description": "Client local cache created."
+      },
+      {
+        "_event": "xdb-local-updated",
+        "_description": "Client local cache updated."
+      },
+      {
+        "_event": "xdb-local-deleted",
+        "_description": "Client local cache deleted."
+      }
+    ]
+  },
+
+  "_exports": {
+    "_modules": [
+      {
+        "_name": "entity-manager",
+        "_scope": "server",
+        "_description": "Authoritative entity CRUD operations.",
+        "_ops": [
+          { "_name": "find" },
+          { "_name": "add" },
+          { "_name": "update" },
+          { "_name": "delete" }
+        ]
+      },
+      {
+        "_name": "entity-client",
+        "_scope": "client",
+        "_description": "Client-side entity CRUD, cache, and sync operations.",
+        "_ops": [
+          { "_name": "find" },
+          { "_name": "add" },
+          { "_name": "update" },
+          { "_name": "delete" },
+          { "_name": "get_local" },
+          { "_name": "sync_entity" }
+        ]
+      },
+      {
+        "_name": "xdb-sync-manager",
+        "_scope": "client",
+        "_description": "Local cache synchronization helper.",
+        "_ops": [
+          { "_name": "sync_entity" }
+        ]
+      }
+    ],
+    "_response_shapes": [
+      {
+        "_name": "find_response",
+        "_shape": {
+          "_ok": true,
+          "_result": {
+            "_records": {
+              "_meta": {
+                "_records": 1
+              },
+              "_data": [
+                {
+                  "_id": "123",
+                  "username": "tamir"
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "_name": "add_response",
+        "_shape": {
+          "_ok": true,
+          "_result": {
+            "_record": {
+              "_id": "123",
+              "username": "tamir"
+            }
+          }
+        }
+      }
+    ]
+  },
+
+  "_patterns": [
+    {
+      "_name": "server_find_users",
+      "_description": "Canonical entity-manager query.",
+      "_example": {
+        "_module": "entity-manager",
+        "_op": "find",
+        "_params": {
+          "_app_id": "vibe-app",
+          "_env": "default",
+          "_entity": "users",
+          "_filter": {}
+        }
+      }
+    },
+    {
+      "_name": "server_add_user",
+      "_description": "Canonical entity create/add.",
+      "_example": {
+        "_module": "entity-manager",
+        "_op": "add",
+        "_params": {
+          "_app_id": "vibe-app",
+          "_env": "default",
+          "_entity": "users",
+          "_data": {
+            "username": "tamir",
+            "email": "tamir@test.com"
+          }
+        }
+      }
+    },
+    {
+      "_name": "server_update_user",
+      "_description": "Canonical entity update.",
+      "_example": {
+        "_module": "entity-manager",
+        "_op": "update",
+        "_params": {
+          "_app_id": "vibe-app",
+          "_env": "default",
+          "_entity": "users",
+          "_filter": {
+            "_id": "123"
+          },
+          "_updates": {
+            "active": true
+          }
+        }
+      }
+    },
+    {
+      "_name": "client_local_records",
+      "_description": "Read synced local cache.",
+      "_example": {
+        "_module": "entity-client",
+        "_op": "get_local",
+        "_params": {
+          "_entity": "users"
+        }
+      }
+    },
+    {
+      "_name": "client_sync_entity",
+      "_description": "Force full server sync.",
+      "_example": {
+        "_module": "entity-client",
+        "_op": "sync_entity",
+        "_params": {
+          "_entity": "users"
+        }
+      }
+    },
+    {
+      "_name": "flow_server_find_users",
+      "_description": "Inside server FlowManager flows, use entity-manager under step._command.",
+      "_example": {
+        "_id": "find-users",
+        "_command": {
+          "_module": "entity-manager",
+          "_op": "find",
+          "_params": {
+            "_app_id": "vibe-app",
+            "_env": "default",
+            "_entity": "users",
+            "_filter": {}
+          }
+        }
+      }
+    }
+  ],
+
+  "_canonical_examples": [
+    {
+      "_module": "entity-manager",
+      "_op": "find",
+      "_params": {
+        "_app_id": "vibe-app",
+        "_env": "default",
+        "_entity": "users",
+        "_filter": {}
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    {
+      "_bad": {
+        "_module": "entity-manager",
+        "_op": "find",
+        "_params": {
+          "filter": {}
+        }
+      },
+      "_reason": "Canonical param is _filter."
+    },
+    {
+      "_bad": {
+        "_module": "entity-manager",
+        "_op": "add",
+        "_params": {
+          "data": {}
+        }
+      },
+      "_reason": "Canonical param is _data."
+    },
+    {
+      "_bad": {
+        "_module": "entity-manager",
+        "_op": "update",
+        "_params": {
+          "updates": {}
+        }
+      },
+      "_reason": "Canonical param is _updates."
+    },
+    {
+      "_bad": {
+        "_id": "find-users",
+        "_command": {
+          "_module": "entity-client",
+          "_op": "find",
+          "_params": {
+            "_entity": "users",
+            "_filter": {}
+          }
+        }
+      },
+      "_reason": "Inside server FlowManager flows, use entity-manager, not entity-client."
+    },
+    {
+      "_bad": "fetch('/api/users')",
+      "_reason": "Use entity-manager/entity-client runtime commands."
+    },
+    {
+      "_bad": "mongoose.find()",
+      "_reason": "Runtime layer is Xpell entity-manager."
+    },
+    {
+      "_bad": "SQL queries",
+      "_reason": "Xpell entities are runtime-managed."
+    },
+    "axios",
+    "Prisma",
+    "TypeORM",
+    "Sequelize",
+    "manual websocket CRUD"
+  ],
+
+  "_notes": [
+    "This skill is for runtime entity operations, not entity schema generation.",
+    "Entity schemas belong to xdb-entity.",
+    "Entity runtime commands can be used directly or inside xfm-flow step._command.",
+    "Authoritative persistence is server-side XDB through entity-manager.",
+    "Client local cache and sync are convenience/runtime cache layers, not authoritative persistence."
+  ]
+}

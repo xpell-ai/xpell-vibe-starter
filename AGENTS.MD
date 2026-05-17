@@ -1,29 +1,38 @@
-AGENTS.md
+# AGENTS.md
 
-Project
+## Project
 
-This is xpell-vibe-starter.
+This is `xpell-vibe-starter`.
 
-Goal:
-Create a minimal Xpell 2 starter app for real-time vibe coding.
+Goal: create a minimal Xpell 2 starter app for real-time vibe coding.
 
-This repository is based on the vibe-server and Xpell contracts, but stripped down to a focused starter. It is not a SaaS platform.
+This repository is based on the old `vibe-server` and Xpell contracts, but stripped down to a focused starter. It is not a SaaS platform.
 
-⸻
+---
 
-Foundation
+## Foundation
 
-Follow these repo-local skills from skills/:
-	•	xpell-contract
-	•	xpell-core
-	•	xpell-node
-	•	xpell-ui
-	•	server-xvm
-	•	vibe-server
-	•	vibe-client
-	•	xpell-app
+Follow these repo-local Codex skills from `skills/codex`:
+
+- `xpell-contract`
+- `xpell-core`
+- `xpell-node`
+- `xpell-ui`
+- `server-xvm`
+- `vibe-server`
+- `vibe-client`
+- `xpell-app`
 
 These skills are authoritative for architecture, transport, persistence, UI rules, and code generation.
+
+Runtime generation knowledge lives in:
+
+```text
+skills/xpell
+
+Use skills/xpell for Vibe AI prompt-building and XUI generation context.
+
+Do not treat skills/xpell as Codex instruction contracts.
 
 ⸻
 
@@ -33,7 +42,7 @@ This starter focuses only on:
 	•	loading an app from the server
 	•	previewing prompt-driven UI/app changes
 	•	applying and persisting confirmed changes
-	•	minimal demo data (users)
+	•	minimal demo data, such as users
 
 This project intentionally excludes:
 	•	multi-tenant SaaS logic
@@ -45,12 +54,12 @@ This project intentionally excludes:
 	•	external channel APIs
 	•	product analytics / billing
 
-Do NOT introduce these features.
+Do not introduce these features.
 
 ⸻
 
 Stack
-	•	TypeScript (ESM, NodeNext)
+	•	TypeScript, ESM, NodeNext
 	•	@xpell/node
 	•	@xpell/ui
 	•	Wormholes v2
@@ -65,11 +74,14 @@ Server
 	•	Entry: server/src/main.ts
 	•	Uses XNode.start()
 	•	Wormholes is handled by XNode / XWebServer internally
-	•	ServerXVMModule is already loaded by XNode — do NOT reimplement or duplicate it
+	•	ServerXVMModule is already loaded by XNode
+	•	Do not reimplement or duplicate ServerXVMModule
 
 Server modules in this starter:
 	•	users → simple demo data
 	•	vibe → prompt → preview/apply flow
+	•	vibe-ai → prompt knowledge selection + XAI generation pipeline
+	•	xai → model provider abstraction loaded by @xpell/node
 
 Client
 	•	Uses XVM / XUI
@@ -89,17 +101,15 @@ Core Flow
 	6.	Server persists through server-xvm
 
 This repo must preserve the distinction:
-	•	preview = temporary, client-side/in-memory
+	•	preview = temporary, client-side / in-memory
 	•	apply = persisted, authoritative
 
 ⸻
 
-Server Rules (STRICT)
-
-Base these on the vibe-server contract  ￼
+Server Rules
 	•	All externally visible behavior must flow through _x.execute(xcmd)
 	•	Use XModule as the only extension point
-	•	Expose operations via _op_* methods only
+	•	Expose operations through underscore-prefixed XModule methods, for example _generate_view
 	•	No transport logic inside modules
 	•	No persistence logic in constructors
 	•	No timers, polling, or autonomous background loops
@@ -112,14 +122,14 @@ Base these on the vibe-server contract  ￼
 
 Persistence Rules
 
-Use the vibe-server persistence style, simplified for the starter  ￼
+Use the vibe-server persistence style, simplified for the starter:
 	•	Use repository + codec boundaries where persistence is needed
-	•	Module ops call repos
-	•	Repos never call modules
+	•	Module ops call repositories
+	•	Repositories never call modules
 	•	App/view persistence goes through server-xvm
 	•	Business/demo data may use XDB filesystem storage
 
-Do NOT add:
+Do not add:
 	•	tenant-aware storage
 	•	multi-instance storage orchestration
 	•	hidden persistence
@@ -129,8 +139,8 @@ Do NOT add:
 
 Transport Rules
 	•	Wormholes v2 is the canonical transport
-	•	Do NOT manually implement Wormholes gateway code in this repo
-	•	Do NOT add Express endpoints for core app logic
+	•	Do not manually implement Wormholes gateway code in this repo
+	•	Do not add Express endpoints for core app logic
 	•	Transport is untrusted
 	•	Server-controlled context must remain authoritative
 
@@ -154,13 +164,13 @@ Allowed starter entities/modules:
 	•	users
 	•	app/views through server-xvm
 
-Optional later, but NOT now:
+Optional later, but not now:
 	•	products
 	•	conversations
 	•	messages
 	•	outbox
 
-These exist in the original vibe-server scope, but they are not needed for this starter  ￼
+These exist in the original vibe-server scope, but they are not needed for this starter.
 
 ⸻
 
@@ -181,18 +191,16 @@ Every feature in this repo must support this path:
 
 prompt → preview → apply → persist
 
-## Output Rules (for coding agents)
-
-- Keep output as short as possible
-- DO NOT print code
-- When modifying files:
-  → output ONLY changed filenames + 1-line description per file
-- Avoid repeating unchanged information
-- Keep explanations minimal (1–3 lines)
-
-If code is absolutely required:
-→ ask for confirmation before printing
-
-Goal: minimize tokens while preserving correctness
-
 If a feature does not support that flow, do not add it.
+
+⸻
+
+Output Rules for Coding Agents
+	•	Keep output as short as possible
+	•	Do not print full files unless explicitly requested
+	•	When modifying files, output only:
+	•	changed filename
+	•	one-line description
+	•	Avoid repeating unchanged information
+	•	Keep explanations minimal, preferably 1–3 lines
+

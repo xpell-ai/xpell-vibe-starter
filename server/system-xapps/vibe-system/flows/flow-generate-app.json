@@ -1,0 +1,15 @@
+{
+  "_id": "flow-generate-app",
+  "_steps": [
+    {
+      "_id": "generate-app",
+      "_command": {
+        "_module": "vibe-ai",
+        "_op": "generate_app",
+        "_params": {
+          "_prompt": "$event.prompt"
+        }
+      }
+    }
+  ]
+}

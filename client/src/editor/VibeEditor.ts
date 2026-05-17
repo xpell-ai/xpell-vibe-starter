@@ -32,17 +32,6 @@ export class VibeEditor {
     XUI.add({
       _id: EDITOR_ID,
       _type: "view",
-      _on: {
-        "vibe:prompt:submit": {
-          _op: "fire",
-          _params: {
-            event: "vibe:prompt:value",
-            data: {
-              _source: "vibe-prompt",
-            },
-          },
-        } as any,
-      },
       style:
         "position:fixed;left:0;right:0;bottom:0;z-index:9999;display:flex;flex-direction:column;gap:12px;padding:16px;background:var(--x-surface, #161616);color:var(--x-text, #f5f5f5);border-top:1px solid var(--x-border, #333333);box-sizing:border-box;",
       _children: [
@@ -70,15 +59,15 @@ export class VibeEditor {
               _id: SEND_ID,
               _type: "button",
               _text: "Send",
-              _debug:true,
-              _on_click: {
-                _op: "fire",
-                _params: {
-                  event: "vibe:prompt:value",
-                  data: {
-                    _source: "vibe-prompt",
-                  },
-                },
+              _debug: true,
+              _on: {
+                click: {
+                  _module: "xem",
+                  _op: "fire",
+                  _params: {
+                    event: "vibe:prompt:send"
+                  }
+                }
               },
               style:
                 "padding:8px 14px;background:var(--x-accent, #2f6fed);color:#ffffff;border:0;cursor:pointer;",

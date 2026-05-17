@@ -10,12 +10,13 @@
   },
   "dependencies": {
     "@xpell/node": "workspace:*",
-    "@xpell/xai-providers": "workspace:*"
+    "@xpell/xai-providers": "workspace:*",
+    "dotenv": "^17.4.2"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
   },
-  "peerDependencies" :{
+  "peerDependencies": {
     "@xpell/core": "workspace:*"
   }
 }

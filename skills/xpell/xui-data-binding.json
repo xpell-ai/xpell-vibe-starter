@@ -1,0 +1,208 @@
+{
+  "_id": "xui-data-binding",
+  "_title": "XUI Data Binding Rules",
+  "_version": "1.0.0",
+  "_active": true,
+  "_type": "view-skill",
+  "_description": "Rules for reactive XUI data binding using _data_source and _on_data.",
+  "_applies_to": ["@xpell/ui", "xui", "data-binding", "xdata", "vibe-ai"],
+
+  "_match": {
+    "_keywords": ["data", "binding", "xdata", "_data_source", "_on_data", "reactive", "render data"],
+    "_requires_any": ["data", "binding", "xdata", "source", "render", "reactive"],
+    "_exclude_keywords": ["react", "vue", "angular"],
+    "_priority": 120
+  },
+
+  "_core_rules": [
+    "Return ONLY valid JSON.",
+    "Use _data_source for reactive XData binding.",
+    "_data_source automatically subscribes the XUIObject to XData updates.",
+    "Use _on_data to react to incoming data updates.",
+    "_on_data executes data-only nano commands through XObject.onData().",
+    "_data_source binding calls XObject.onData(...), which may execute _on_data, _on.data, or _once.data handlers.",
+    "Do NOT generate React/Vue/Angular binding syntax.",
+    "Do NOT generate _bind.xdata syntax.",
+    "Do NOT generate manual polling loops.",
+    "Do NOT generate addEventListener for data updates.",
+    "Do NOT generate direct _xd.on calls inside views.",
+    "Use nano commands to transform or render incoming data.",
+    "Objects and arrays should typically use set-text-from-data for text rendering."
+  ],
+
+  "_priority_rules": [
+    "_data_source must be a string XData key.",
+    "Do NOT wrap _data_source in objects.",
+    "Use _type:\"textarea\" for textarea controls. Do NOT emulate textarea with input/type attributes.",
+    "Textarea sizing should be inside the style string.",
+    "Do NOT generate width or min-height as standalone fields.",
+    "When rendering XData into visible text, prefer set-text-from-data over set-text.",
+    "If incoming data may be an object or array, always include _on_data with set-text-from-data."
+  ],
+
+  "_fields": {
+    "_data_source": "String XData key to subscribe to.",
+    "_on_data": "Data-only nano command, module command, or sequence executed when data changes.",
+    "_process_data": "Optional boolean. Enables or disables data processing.",
+    "_on": {
+      "data": "Optional event-map data handler."
+    },
+    "_once": {
+      "data": "Optional one-time data handler."
+    }
+  },
+
+  "_exports": {
+    "_xui_fields": [
+      "_data_source",
+      "_on_data",
+      "_process_data",
+      "_on",
+      "_once"
+    ],
+    "_nano_commands": [
+      {
+        "_name": "set-text-from-data",
+        "_scope": "object",
+        "_description": "Render incoming data into object text."
+      },
+      {
+        "_name": "set-text",
+        "_scope": "object",
+        "_description": "Set explicit text. Not preferred for reactive data unless text is already provided."
+      }
+    ],
+    "_xdata_keys": []
+  },
+
+  "_patterns": [
+    {
+      "_name": "textarea_render_json",
+      "_description": "Render XData JSON into textarea.",
+      "_example": {
+        "_type": "textarea",
+        "_id": "users-output",
+        "rows": 20,
+        "style": "width:100%;min-height:300px;",
+        "_data_source": "users:raw",
+        "_on_data": {
+          "_op": "set-text-from-data"
+        }
+      }
+    },
+    {
+      "_name": "label_render_value",
+      "_description": "Render simple text value into label.",
+      "_example": {
+        "_type": "label",
+        "_id": "status-label",
+        "_data_source": "app:status",
+        "_on_data": {
+          "_op": "set-text-from-data"
+        }
+      }
+    },
+    {
+      "_name": "formatted_data_render",
+      "_description": "Render formatted text using pattern.",
+      "_example": {
+        "_type": "label",
+        "_id": "user-count",
+        "_data_source": "users:count",
+        "_on_data": {
+          "_op": "set-text-from-data",
+          "_params": {
+            "pattern": "Users: $data"
+          }
+        }
+      }
+    },
+    {
+      "_name": "clear_after_render",
+      "_description": "Consume and clear transient XData after render.",
+      "_example": {
+        "_type": "label",
+        "_id": "toast-message",
+        "_data_source": "toast:message",
+        "_on_data": {
+          "_op": "set-text-from-data",
+          "_params": {
+            "empty": true
+          }
+        }
+      }
+    }
+  ],
+
+  "_canonical_examples": [
+    {
+      "_view": {
+        "_id": "main",
+        "_type": "view",
+        "_children": [
+          {
+            "_type": "button",
+            "_id": "btn-get-users",
+            "_text": "Get Users",
+            "_flow": "flow-get-users"
+          },
+          {
+            "_type": "textarea",
+            "_id": "users-output",
+            "rows": 20,
+            "style": "width:100%;min-height:300px;",
+            "_data_source": "users:raw",
+            "_on_data": {
+              "_op": "set-text-from-data"
+            }
+          }
+        ]
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    {
+      "_bad": {
+        "_bind": {
+          "xdata": "users:raw"
+        }
+      },
+      "_reason": "_bind.xdata is not canonical Xpell binding syntax. Use _data_source."
+    },
+    {
+      "_bad": {
+        "_type": "textarea",
+        "_data_source": "users:raw"
+      },
+      "_reason": "When incoming data may be an object or array, include _on_data with set-text-from-data."
+    },
+    {
+      "_bad": {
+        "_on_data": {
+          "_op": "set-text"
+        }
+      },
+      "_reason": "set-text expects explicit text params. Use set-text-from-data for reactive data rendering."
+    },
+    {
+      "_bad": {
+        "_type": "input",
+        "type": "textarea"
+      },
+      "_reason": "Textarea controls must use _type:\"textarea\"."
+    },
+    "React state binding",
+    "Vue v-model",
+    "Angular ngModel",
+    "_xd.on inside views",
+    "manual polling",
+    "unbounded setInterval data refresh"
+  ],
+
+  "_notes": [
+    "This skill depends on xui-core and xpell-core behavior.",
+    "_data_source binds through XObject/XUIObject lifecycle, not manual event listeners.",
+    "Use style string for DOM styling fields such as width and min-height."
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "_id": "xpell-contract",
+  "_title": "Xpell Contract",
+  "_version": "1.0.0",
+  "_active": true,
+  "_type": "general",
+  "_description": "Always-loaded base contract for Vibe AI generation across Xpell views, flows, entities, commands, modules, and skills.",
+  "_applies_to": [
+    "vibe-ai",
+    "xpell",
+    "xui",
+    "flows",
+    "entities",
+    "commands",
+    "plans",
+    "skills"
+  ],
+
+  "_match": {
+    "_keywords": [
+      "xpell",
+      "vibe",
+      "view",
+      "flow",
+      "entity",
+      "command",
+      "skill",
+      "xdata",
+      "xem",
+      "nano-command",
+      "runtime"
+    ],
+    "_requires_any": [
+      "xpell",
+      "vibe",
+      "view",
+      "flow",
+      "entity",
+      "command",
+      "skill",
+      "ui",
+      "screen",
+      "page",
+      "layout",
+      "form"
+    ],
+    "_exclude_keywords": [],
+    "_priority": 1000
+  },
+
+  "_core_rules": [
+    "Do not infer missing state.",
+    "When source truth is required but not provided, request the relevant skill/context instead of guessing.",
+    "Do not guess APIs, paths, state ownership, persistence, module behavior, or runtime flow.",
+    "Xpell is a deterministic real-time interpreter.",
+    "State must be explicit and inspectable.",
+    "No hidden auto-magic.",
+    "No hidden auto-repair.",
+    "No silent background mutation.",
+    "No implicit persistence.",
+    "No inferred architecture.",
+    "Runtime behavior must happen through modules, commands, events, or documented XData keys.",
+    "Runtime/system fields must start with _.",
+    "Runtime-managed fields must use _snake_case.",
+    "Runtime command params must use _snake_case for system/runtime fields.",
+    "Business data fields may use schema-defined names.",
+    "Method names may use camelCase.",
+    "Module operations are exposed as underscore methods.",
+    "_x.execute(...) is the canonical execution path.",
+    "External actions must route through _x.execute.",
+    "Flow steps must execute commands, not arbitrary functions.",
+    "Remote commands must be validated before execution.",
+    "Commands must be explicit JSON-compatible data.",
+    "Generation output must match the requested artifact type: _view, _flow, _entity, or command JSON.",
+    "Do not mix artifact roots. A view response uses _view. A flow response uses _flow. An entity response uses _entity.",
+    "XData is shared runtime memory, not persistence.",
+    "Every XData mutation must include a stable source.",
+    "XData keys must be stable and namespaced.",
+    "Do not use XData as a database.",
+    "Do not use XData as an event bus.",
+    "Do not mirror XData into hidden shadow state.",
+    "Events coordinate behavior. Events are not state.",
+    "_xem is a lightweight event bus.",
+    "Listener order must not be assumed.",
+    "Event payloads must be explicit.",
+    "No hidden control flow through events.",
+    "Persistence must be explicit.",
+    "Persisted app/view/flow/entity/plan data must be JSON/data-only.",
+    "Do not persist functions or executable JavaScript.",
+    "Persisted handlers must be data-only.",
+    "No persisted JS functions.",
+    "No eval.",
+    "No function strings.",
+    "No inline scripts.",
+    "Unknown ops must be rejected at validation boundaries.",
+    "Nano commands without _module are local/object-scoped.",
+    "Commands with _module route through _x.execute.",
+    "External input is untrusted.",
+    "Validate command shape before execution.",
+    "AI output must be validated before apply.",
+    "AI output must become plans, commands, views, flows, entities, or patches.",
+    "AI must not bypass module boundaries.",
+    "AI must not invent APIs when source truth is available.",
+    "Search existing utilities, modules, packs, commands, and contracts first.",
+    "Prefer existing helpers over new boilerplate.",
+    "Generate only the missing delta.",
+    "No hidden loops.",
+    "No unbounded setInterval or polling loops.",
+    "No busy loops.",
+    "No unbounded retries.",
+    "No hidden background schedulers."
+  ],
+
+  "_priority_rules": [
+    "xpell-contract is the always-loaded base contract and should have the highest priority.",
+    "Generation output must match exactly one requested artifact root.",
+    "Use _view only for view generation.",
+    "Use _flow only for flow generation.",
+    "Use _entity only for entity generation.",
+    "Use command JSON only for command generation.",
+    "Layer/product skills may add stricter rules, but must not violate this contract.",
+    "When source truth is required but not provided, request the relevant skill/context instead of guessing.",
+    "Compose existing capabilities first; generate only what is missing."
+  ],
+
+  "_fields": {
+    "_artifact_roots": [
+      "_view",
+      "_flow",
+      "_entity"
+    ],
+    "_command_shape": {
+      "_module": "module_name",
+      "_op": "operation_name",
+      "_params": {}
+    },
+    "_real_command_example": {
+      "_module": "entity-manager",
+      "_op": "add",
+      "_params": {
+        "_entity": "users",
+        "_data": {
+          "display_name": "Tamir"
+        }
+      }
+    },
+    "_allowed_persisted_handler_forms": [
+      "string nano-command",
+      "object command",
+      "module command",
+      "sequence"
+    ],
+    "_forbidden_background_work": [
+      "unbounded setInterval",
+      "polling loops",
+      "busy loops",
+      "unbounded retries",
+      "hidden background schedulers"
+    ]
+  },
+
+  "_patterns": [
+    {
+      "_name": "entity_manager_add",
+      "_description": "Canonical command-style entity add through entity-manager.",
+      "_example": {
+        "_module": "entity-manager",
+        "_op": "add",
+        "_params": {
+          "_entity": "users",
+          "_data": {
+            "display_name": "Tamir"
+          }
+        }
+      }
+    },
+    {
+      "_name": "single_artifact_root_view",
+      "_description": "View generation must return only a _view root.",
+      "_example": {
+        "_view": {
+          "_id": "main",
+          "_type": "view",
+          "_children": []
+        }
+      }
+    },
+    {
+      "_name": "single_artifact_root_flow",
+      "_description": "Flow generation must return only a _flow root.",
+      "_example": {
+        "_flow": {
+          "_id": "save-user",
+          "_steps": []
+        }
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    "Inferring missing APIs, paths, ownership, persistence, or runtime flow.",
+    "Mixing _view, _flow, and _entity roots in one generated artifact.",
+    "Using command params without _snake_case for runtime/system fields.",
+    "Using XData as persistence.",
+    "Using XData as an event bus.",
+    "Mirroring XData into hidden shadow state.",
+    "Persisting JavaScript functions.",
+    "Using eval, function strings, or inline scripts.",
+    "AI directly mutating runtime state.",
+    "Generating large systems before searching existing utilities/modules/packs.",
+    "Unbounded setInterval or polling loops.",
+    "Busy loops.",
+    "Unbounded retries.",
+    "Hidden background schedulers."
+  ],
+
+  "_notes": [
+    "This version is adapted for Vibe AI prompt generation, not Codex repo execution.",
+    "Business data fields may follow their entity schema; runtime/system fields stay underscore-prefixed.",
+    "Always prefer a single requested artifact root."
+  ]
+}

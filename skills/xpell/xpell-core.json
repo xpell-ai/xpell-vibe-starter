@@ -1,0 +1,429 @@
+{
+  "_id": "xpell-core",
+  "_title": "Xpell Core Generation Rules",
+  "_version": "1.1.0",
+  "_active": true,
+  "_type": "runtime-api-skill",
+  "_description": "Vibe AI generation rules for @xpell/core runtime behavior: XpellEngine, XModule, XObject, XData, XDataModule, XEM, commands, nano-commands, runtime accessor injection, and platform-neutral execution.",
+  "_applies_to": [
+    "@xpell/core",
+    "vibe-ai",
+    "runtime",
+    "commands",
+    "xmodule",
+    "xobject",
+    "xdata",
+    "xem",
+    "nano-commands",
+    "flows",
+    "agent-generated-handlers"
+  ],
+
+  "_match": {
+    "_keywords": [
+      "xpell-core",
+      "core",
+      "runtime",
+      "xmodule",
+      "xobject",
+      "xdata",
+      "xd",
+      "xem",
+      "nano-command",
+      "command",
+      "handler",
+      "on_data",
+      "on_frame",
+      "getXRuntime",
+      "setXRuntime"
+    ],
+    "_requires_any": [
+      "core",
+      "runtime",
+      "command",
+      "module",
+      "object",
+      "xdata",
+      "xd",
+      "xem",
+      "nano",
+      "handler",
+      "flow"
+    ],
+    "_exclude_keywords": [],
+    "_priority": 900
+  },
+
+  "_core_rules": [
+    "Apply xpell-contract first.",
+    "@xpell/core is platform-neutral runtime foundation.",
+    "@xpell/core is not a UI renderer, DOM layer, Node/server layer, persistence layer, or business framework.",
+    "Do not add UI, DOM, CSS, show/hide, layout, browser API, server API, or filesystem behavior to XObject or core.",
+    "Core primitives such as XObject must not import _x or Xpell directly.",
+    "Use setXRuntime(runtime) and getXRuntime() for runtime accessor injection.",
+    "XObject may call getXRuntime() only for _module command routing.",
+    "Do not use dynamic import('./Xpell') inside XObject.",
+    "Module commands require explicit _module and _op.",
+    "Local nano commands require _op and omit _module.",
+    "XModule command my-op maps to method _my_op.",
+    "Object-targeted commands require explicit _object.",
+    "XObject.execute priority is: _module routing first, then local nano command, then error.",
+    "Commands with _module always route through getXRuntime().execute(...).",
+    "Local nano commands are used only when _module is omitted.",
+    "XData/_xd is shared runtime memory only.",
+    "XData is not persistence.",
+    "XData is not an event bus.",
+    "Use canonical XData APIs: get, set, patch, touch, has, delete, pick, on, off, onAny, clean.",
+    "Every XData mutation must include stable source metadata.",
+    "XData keys must be explicit, stable, and namespaced.",
+    "New code must not write through _xd._o[...]",
+    "_o may exist only for legacy compatibility and migration.",
+    "XDataModule is a thin command bridge over XData and owns no independent state.",
+    "Canonical XData command bridge module name is xd.",
+    "xd mutating ops must include stable source.",
+    "xd commands must use explicit keys and must not infer missing state.",
+    "_xem is a lightweight event bus for coordination only.",
+    "Events are not state and not persistence.",
+    "Listener order must not be assumed.",
+    "Event payloads must be explicit.",
+    "Use XData for state and _xem for signals.",
+    "Persisted or agent-generated handlers must be data-only.",
+    "Allowed handler forms are string nano-command, JSON local command, JSON module command, or array sequence.",
+    "No JS functions in persisted or agent-editable payloads.",
+    "No eval.",
+    "No function strings.",
+    "Unknown ops must be rejected at validation boundaries.",
+    "_data_source binding uses _xd.on(...).",
+    "_data_source binding calls XObject.onData(...), which may execute _on_data, _on.data, or _once.data handlers.",
+    "Data delivery is subscription-based, not frame polling.",
+    "dispose() must unbind data listeners and event listeners.",
+    "Use XError and XResponse* for protocol-facing failures.",
+    "Never log secrets, tokens, credentials, auth headers, or private keys."
+  ],
+
+  "_priority_rules": [
+    "When generating a module command, always use explicit _module, _op, and _params.",
+    "When generating a local nano command, use _op and _params without _module.",
+    "For XData state mutation from generated handlers, prefer the xd command bridge instead of direct _xd access.",
+    "For state use xd/XData; for signals use xem/_xem.",
+    "For local object behavior, use nano-command JSON without _module.",
+    "For cross-module behavior, use JSON command with _module.",
+    "Do not generate function handlers for views, flows, entities, or agent-editable payloads.",
+    "Do not introduce timers, polling loops, or hidden background schedulers in core.",
+    "If docs and source disagree, follow source/API map and record the mismatch."
+  ],
+
+  "_fields": {
+    "_module_command_shape": {
+      "_module": "module_name",
+      "_op": "operation_name",
+      "_params": {}
+    },
+    "_local_nano_command_shape": {
+      "_op": "operation_name",
+      "_params": {}
+    },
+    "_object_command_shape": {
+      "_module": "module_name",
+      "_op": "operation_name",
+      "_object": "object_id",
+      "_params": {}
+    },
+    "_xdata_command_shape": {
+      "_module": "xd",
+      "_op": "set",
+      "_params": {
+        "key": "ui:status",
+        "value": "ready",
+        "source": "example"
+      }
+    },
+    "_xem_command_shape": {
+      "_module": "xem",
+      "_op": "fire",
+      "_params": {
+        "event": "vibe:prompt:send",
+        "data": {
+          "source": "vibe-editor"
+        }
+      }
+    },
+    "_handler_fields": [
+      "_on_create",
+      "_on_mount",
+      "_on_data",
+      "_on_frame",
+      "_on",
+      "_once"
+    ],
+    "_data_handler_paths": [
+      "_on_data",
+      "_on.data",
+      "_once.data"
+    ],
+    "_xdata_ops": [
+      "get",
+      "set",
+      "patch",
+      "delete",
+      "touch",
+      "has",
+      "pick"
+    ],
+    "_xdata_api": [
+      "get",
+      "set",
+      "patch",
+      "touch",
+      "has",
+      "delete",
+      "pick",
+      "on",
+      "off",
+      "onAny",
+      "clean"
+    ],
+    "_core_singletons": [
+      "_x",
+      "_xd",
+      "_xem",
+      "_xlog",
+      "_xu"
+    ],
+    "_runtime_helpers": [
+      "setXRuntime",
+      "getXRuntime",
+      "setXEventManager",
+      "getXEventManager"
+    ],
+    "_hot_classes": [
+      "XpellEngine",
+      "XModule",
+      "XObject",
+      "XObjectManager",
+      "XCommand",
+      "XData",
+      "XEventManager",
+      "XParser",
+      "XError",
+      "XResponse",
+      "XResponseOK",
+      "XResponseError"
+    ]
+  },
+
+  "_exports": {
+    "_modules": [
+      {
+        "_name": "xd",
+        "_scope": "shared",
+        "_description": "XData command bridge module.",
+        "_ops": [
+          { "_name": "get" },
+          { "_name": "set" },
+          { "_name": "patch" },
+          { "_name": "delete" },
+          { "_name": "touch" },
+          { "_name": "has" },
+          { "_name": "pick" }
+        ]
+      },
+      {
+        "_name": "xem",
+        "_scope": "shared",
+        "_description": "Event coordination command bridge/module when available.",
+        "_ops": [
+          { "_name": "fire" }
+        ]
+      }
+    ],
+    "_nano_commands": [
+      { "_name": "info", "_scope": "object" },
+      { "_name": "log", "_scope": "object" },
+      { "_name": "fire", "_scope": "object" },
+      { "_name": "noop", "_scope": "object" },
+      { "_name": "run-seq", "_scope": "object" }
+    ],
+    "_xdata_keys": [
+      "engine:frame-number",
+      "engine:fps"
+    ],
+    "_response_shapes": [
+      {
+        "_name": "module_command",
+        "_shape": {
+          "_module": "module_name",
+          "_op": "operation_name",
+          "_params": {}
+        }
+      },
+      {
+        "_name": "local_nano_command",
+        "_shape": {
+          "_op": "operation_name",
+          "_params": {}
+        }
+      },
+      {
+        "_name": "object_targeted_command",
+        "_shape": {
+          "_module": "module_name",
+          "_op": "operation_name",
+          "_object": "object_id",
+          "_params": {}
+        }
+      }
+    ]
+  },
+
+  "_patterns": [
+    {
+      "_name": "xdata_set_from_handler",
+      "_description": "Set shared runtime state through the xd command bridge.",
+      "_example": {
+        "_module": "xd",
+        "_op": "set",
+        "_params": {
+          "key": "ui:status",
+          "value": "ready",
+          "source": "vibe-ai"
+        }
+      }
+    },
+    {
+      "_name": "xem_signal_from_handler",
+      "_description": "Fire an explicit coordination signal.",
+      "_example": {
+        "_module": "xem",
+        "_op": "fire",
+        "_params": {
+          "event": "vibe:prompt:send",
+          "data": {
+            "source": "vibe-editor"
+          }
+        }
+      }
+    },
+    {
+      "_name": "local_nano_command",
+      "_description": "Use local object-scoped nano command when no module routing is required.",
+      "_example": {
+        "_op": "log",
+        "_params": {
+          "message": "clicked"
+        }
+      }
+    },
+    {
+      "_name": "handler_sequence",
+      "_description": "Use an array sequence for multiple data-only handler steps.",
+      "_example": [
+        {
+          "_module": "xd",
+          "_op": "set",
+          "_params": {
+            "key": "ui:clicked",
+            "value": true,
+            "source": "button"
+          }
+        },
+        {
+          "_op": "log",
+          "_params": {
+            "message": "clicked"
+          }
+        }
+      ]
+    },
+    {
+      "_name": "on_data_handler",
+      "_description": "Use _on_data for data-source updates.",
+      "_example": {
+        "_data_source": "user:profile",
+        "_on_data": {
+          "_op": "log",
+          "_params": {
+            "message": "data updated"
+          }
+        }
+      }
+    }
+  ],
+
+  "_canonical_examples": [
+    {
+      "_module": "xd",
+      "_op": "set",
+      "_params": {
+        "key": "form:email",
+        "value": "test@example.com",
+        "source": "login_form"
+      }
+    },
+    {
+      "_module": "xem",
+      "_op": "fire",
+      "_params": {
+        "event": "vibe:prompt:send",
+        "data": {
+          "source": "vibe-editor"
+        }
+      }
+    },
+    {
+      "_op": "set-text",
+      "_params": {
+        "text": "Hello"
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    "Adding DOM, CSS, show/hide, layout, browser APIs, server APIs, or filesystem APIs to XObject/core.",
+    "Importing _x or Xpell directly inside XObject.",
+    "Using dynamic import('./Xpell') inside XObject.",
+    "Using XData as persistence.",
+    "Using XData as an event bus.",
+    "Using events as state.",
+    "Writing new code through _xd._o[...]",
+    "Relying on listener ordering.",
+    "Persisting JS functions.",
+    "Using eval or executable strings in persisted payloads.",
+    "Creating hidden cross-module mutation paths.",
+    "Adding hidden timers, polling loops, or background schedulers in core.",
+    {
+      "_bad": {
+        "_on_click": "() => save()"
+      },
+      "_reason": "Persisted or agent-generated handlers must be data-only."
+    },
+    {
+      "_bad": {
+        "_module": "xd",
+        "_op": "set",
+        "_params": {
+          "key": "ui:status",
+          "value": "ready"
+        }
+      },
+      "_reason": "Mutating XData commands must include stable source."
+    },
+    {
+      "_bad": {
+        "_module": "xd",
+        "_op": "set-text",
+        "_params": {
+          "text": "Hello"
+        }
+      },
+      "_reason": "Local nano commands should omit _module. Commands with _module are routed through getXRuntime().execute(...)."
+    }
+  ],
+
+  "_notes": [
+    "This is the Vibe-generation version of the @xpell/core contract.",
+    "XObject.execute currently routes _module commands before local nano commands.",
+    "Commands with _module always route through getXRuntime().execute(...); local nano commands are used when _module is omitted.",
+    "DOM/browser event adaptation belongs in @xpell/ui, Node/transport/filesystem behavior belongs in @xpell/node, and 3D/spatial behavior belongs in @xpell/3d."
+  ]
+}

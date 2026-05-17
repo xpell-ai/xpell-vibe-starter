@@ -1,0 +1,35 @@
+{
+  "_id": "main",
+  "_type": "view",
+  "style": "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#111;color:white;",
+  "_children": [
+    {
+      "_type": "view",
+      "style": "width:600px;display:flex;flex-direction:column;gap:20px;padding:40px;",
+      "_children": [
+        {
+          "_type": "label",
+          "_text": "What do you want to build?"
+        },
+        {
+          "_type": "textarea",
+          "_id": "prompt-input",
+          "_data_source": "vibe:prompt",
+          "_on_data": {
+            "_op": "set-text-from-data"
+          }
+        },
+        {
+          "_type": "button",
+          "_text": "Generate App",
+          "_flow": {
+            "_id": "flow-generate-app",
+            "_payload": {
+              "prompt": "$xdata.vibe:prompt"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

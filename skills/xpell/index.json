@@ -1,0 +1,24 @@
+{
+  "_id": "xpell-skills-index",
+  "_version": "1.0.0",
+  "_description": "Runtime Xpell skill registry used by Vibe AI prompt generation.",
+  "_schema": "xpell-skill.schema.json",
+
+  "_autoload": true,
+  "_skills_dir": ".",
+
+  "_always_include": [
+    "xpell-contract",
+    "xpell-core"
+  ],
+
+  "_priority_order": [
+    "xpell-contract",
+    "xpell-core"
+  ],
+
+  "_exclude_files": [
+    "index.json",
+    "xpell-skill.schema.json"
+  ]
+}

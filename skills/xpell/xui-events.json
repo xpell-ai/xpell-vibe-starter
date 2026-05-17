@@ -1,0 +1,308 @@
+{
+  "_id": "xui-events",
+  "_title": "XUI Event System Rules",
+  "_version": "1.0.0",
+  "_active": true,
+  "_type": "view-skill",
+  "_description": "Rules for XUI event handlers using _on, lifecycle hooks, _xem signals, and data-only nano-command handlers.",
+  "_applies_to": ["@xpell/ui", "xui", "events", "handlers", "nano-commands", "vibe-ai"],
+
+  "_match": {
+    "_keywords": ["event", "events", "click", "change", "keyup", "_on", "_on_mount", "_on_data", "_xem", "handler"],
+    "_requires_any": ["event", "click", "change", "input", "handler", "mount", "data", "frame"],
+    "_exclude_keywords": ["react", "vue", "angular"],
+    "_priority": 130
+  },
+
+  "_core_rules": [
+    "Use Xpell/XUI event handler fields only.",
+    "Do NOT generate DOM handler attributes such as onclick, onchange, onkeyup, or onsubmit.",
+    "Do NOT generate addEventListener inside views.",
+    "Prefer JSON nano-commands over JS functions.",
+    "Do NOT generate JS functions unless explicitly requested.",
+    "Persisted or agent-generated handlers must be data-only.",
+    "Use _on for DOM-style object events such as click, change, input, keyup, submit.",
+    "Use lifecycle hooks for runtime lifecycle behavior.",
+    "Use _on_data for XData binding updates.",
+    "Use _on_frame for frame-driven behavior instead of timers.",
+    "Use _xem or the fire nano-command for signals, not for storing state.",
+    "Events coordinate behavior; events are not state."
+  ],
+
+  "_priority_rules": [
+    "When the requested action is to run/trigger/execute a FlowManager flow, do NOT use _on.click.fire. Use root-level _flow from xui-flow-trigger.",
+    "For button actions that are not FlowManager flow triggers, use _on.click with a data-only handler.",
+    "For input changes, use _on.change or _on.input, not _on_change.",
+    "For mount behavior, use _on_mount.",
+    "For data-source updates, use _on_data.",
+    "For repeated frame behavior, use _on_frame, not setInterval.",
+    "For cross-object or app-level signals, use fire or a module command to xem.",
+    "Use command JSON or handler sequences when more than one action is needed."
+  ],
+
+  "_fields": {
+    "_preferred_hooks": [
+      "_on_create",
+      "_on_mount",
+      "_on_show",
+      "_on_hide",
+      "_on_data",
+      "_on_frame",
+      "_on",
+      "_once"
+    ],
+    "_event_layers": {
+      "_global": {
+        "_system": "_xem",
+        "_usage": "Use _xem for app/global coordination signals. In persisted/generated JSON prefer command/nano-command forms instead of JS handlers."
+      },
+      "_object": {
+        "_system": "_on and lifecycle hooks",
+        "_usage": "Use _on for object events and lifecycle hook fields for lifecycle behavior."
+      }
+    },
+    "_deprecated_hooks": [
+      {
+        "_name": "_on_change",
+        "_replacement": "_on: { \"change\": ... }"
+      }
+    ],
+    "_handler_forms": [
+      "string nano-command",
+      "JSON local command",
+      "JSON module command",
+      "array sequence"
+    ]
+  },
+
+  "_exports": {
+    "_xui_fields": [
+      "_on",
+      "_once",
+      "_on_create",
+      "_on_mount",
+      "_on_show",
+      "_on_hide",
+      "_on_data",
+      "_on_frame"
+    ],
+    "_nano_commands": [
+      {
+        "_name": "fire",
+        "_scope": "object",
+        "_description": "Fire an Xpell/XEM-style signal from an object handler."
+      },
+      {
+        "_name": "log",
+        "_scope": "object",
+        "_description": "Log/debug handler execution."
+      },
+      {
+        "_name": "noop",
+        "_scope": "object",
+        "_description": "No-op handler."
+      }
+    ],
+    "_modules": [
+      {
+        "_name": "xem",
+        "_scope": "shared",
+        "_description": "Global event coordination module when available.",
+        "_ops": [
+          {
+            "_name": "fire",
+            "_description": "Fire a named event with explicit payload."
+          }
+        ]
+      }
+    ]
+  },
+
+  "_patterns": [
+    {
+      "_name": "button_click",
+      "_description": "Button click using _on.click and a data-only nano command for non-flow actions.",
+      "_example": {
+        "_type": "button",
+        "_text": "Submit",
+        "_on": {
+          "click": {
+            "_op": "fire",
+            "_params": {
+              "event": "submit",
+              "data": {
+                "source": "submit-button"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "_name": "input_change",
+      "_description": "Input change using _on.change, not _on_change.",
+      "_example": {
+        "_type": "input",
+        "_id": "email",
+        "_on": {
+          "change": {
+            "_op": "fire",
+            "_params": {
+              "event": "input:changed",
+              "data": {
+                "field": "email"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "_name": "mount_logic",
+      "_description": "Run data-only mount behavior.",
+      "_example": {
+        "_type": "view",
+        "_on_mount": {
+          "_op": "fire",
+          "_params": {
+            "event": "view:mounted",
+            "data": {
+              "source": "main-view"
+            }
+          }
+        }
+      }
+    },
+    {
+      "_name": "handler_sequence",
+      "_description": "Use a sequence for multiple event actions.",
+      "_example": {
+        "_type": "button",
+        "_text": "Save",
+        "_on": {
+          "click": [
+            {
+              "_module": "xd",
+              "_op": "set",
+              "_params": {
+                "key": "ui:status",
+                "value": "saving",
+                "source": "save-button"
+              }
+            },
+            {
+              "_op": "fire",
+              "_params": {
+                "event": "save:requested",
+                "data": {
+                  "source": "save-button"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+
+  "_canonical_examples": [
+    {
+      "_view": {
+        "_id": "main",
+        "_type": "view",
+        "_children": [
+          {
+            "_type": "button",
+            "_id": "btn-submit",
+            "_text": "Submit",
+            "_on": {
+              "click": {
+                "_op": "fire",
+                "_params": {
+                  "event": "submit",
+                  "data": {
+                    "source": "btn-submit"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "_type": "input",
+            "_id": "email",
+            "placeholder": "Email",
+            "_on": {
+              "change": {
+                "_op": "fire",
+                "_params": {
+                  "event": "input:changed",
+                  "data": {
+                    "field": "email"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    {
+      "_bad": {
+        "onclick": "submit()"
+      },
+      "_reason": "Do not use DOM handler attributes. Use _on.click."
+    },
+    {
+      "_bad": {
+        "_on_change": {
+          "_op": "fire",
+          "_params": {
+            "event": "changed"
+          }
+        }
+      },
+      "_reason": "Use _on: { \"change\": ... } instead of _on_change."
+    },
+    {
+      "_bad": {
+        "_on": {
+          "click": "() => save()"
+        }
+      },
+      "_reason": "Persisted or agent-generated handlers must be data-only, not JS functions."
+    },
+    {
+      "_bad": {
+        "_type": "button",
+        "_text": "Get Users",
+        "_on": {
+          "click": {
+            "_op": "fire",
+            "_params": {
+              "event": "flow-get-users"
+            }
+          }
+        }
+      },
+      "_reason": "This fires a raw XEM signal. FlowManager flows must use root-level _flow."
+    },
+    "onChange",
+    "addEventListener",
+    "setTimeout",
+    "unbounded setInterval",
+    "React events",
+    "Vue events",
+    "Angular events"
+  ],
+
+  "_notes": [
+    "This skill depends on xpell-contract, xpell-core, xui-core, and should defer FlowManager flow triggers to xui-flow-trigger.",
+    "_on is the preferred object event map for DOM-style events.",
+    "_xem/global events are coordination signals, not state storage.",
+    "Use _on_frame only for frame-driven behavior where the runtime supports it.",
+    "FlowManager flow execution belongs to xui-flow-trigger and should use root-level _flow."
+  ]
+}

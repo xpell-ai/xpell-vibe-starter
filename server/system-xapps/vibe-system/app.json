@@ -1,0 +1,11 @@
+{
+  "_app_id": "vibe-system",
+  "_env": "default",
+  "_title": "VIBE System",
+  "_system": true,
+  "_readonly": true,
+  "_version": 1,
+  "_meta": {
+    "_entry_view_id": "main"
+  }
+}

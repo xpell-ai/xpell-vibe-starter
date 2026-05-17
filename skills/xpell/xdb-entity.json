@@ -1,0 +1,361 @@
+{
+  "_id": "xdb-entity",
+  "_title": "XDB Entity Generation Rules",
+  "_version": "1.0.0",
+  "_active": true,
+  "_type": "entity-skill",
+  "_description": "Rules for generating XDB entity definitions for Vibe AI using root _entity, schema fields, indexes, relationships, and security-safe persistence.",
+  "_applies_to": ["vibe-ai", "xdb", "entity", "entity-generation", "entity-manager"],
+
+  "_requires": ["xpell-contract", "xpell-core"],
+
+  "_match": {
+    "_keywords": ["xdb", "entity", "_entity", "_schema", "schema", "fields", "index", "hash", "objectid"],
+    "_requires_any": ["entity", "schema", "xdb", "model", "collection", "fields"],
+    "_exclude_keywords": ["react", "vue", "sql"],
+    "_priority": 280
+  },
+
+  "_core_rules": [
+    "Return ONLY valid JSON.",
+    "Root must be { \"_entity\": { ... } }.",
+    "Do include root _entity._id.",
+    "Do NOT return markdown, explanations, comments, TypeScript, or code.",
+    "Generate XDB entity definitions only.",
+    "Do NOT generate records/data unless explicitly requested.",
+    "Do NOT include _created_at or _updated_at in schema; XDBEntity injects them automatically.",
+    "Do NOT include _id in _schema unless a custom primary identity is explicitly required.",
+    "Use GUID _id as canonical identity.",
+    "Never use sequential IDs as identity.",
+    "Use Hash type for passwords or credential verifiers.",
+    "Use indexes only when lookup, uniqueness, sorting, or relationship resolution requires them.",
+    "Business fields may use schema-defined names without underscore.",
+    "Runtime/system metadata fields must use _snake_case."
+  ],
+
+  "_priority_rules": [
+    "When generating an entity for Vibe AI, return only a root _entity artifact.",
+    "Do NOT mix _entity with _view or _flow roots.",
+    "Use _schema for field definitions.",
+    "Use _meta._version for entity schema version.",
+    "Use ObjectId for references to other entity records.",
+    "Use Array for lists of values or GUID references.",
+    "Use _embed only for fields intended for semantic/vector search.",
+    "Use _toFile only when large field content should be stored as a file payload.",
+    "Prefer minimal schemas; do not add extra fields not requested.",
+    "Never store access tokens, API keys, or secrets in XDB records."
+  ],
+
+  "_fields": {
+    "_entity_shape": {
+      "_entity": {
+        "_id": "entity-name",
+        "_title": "Entity Title",
+        "_description": "Entity description",
+        "_meta": {
+          "_version": 1
+        },
+        "_schema": {}
+      }
+    },
+    "_required_entity_fields": [
+      "_id",
+      "_title",
+      "_description",
+      "_meta",
+      "_schema"
+    ],
+    "_field_types": [
+      "String",
+      "Number",
+      "ObjectId",
+      "Boolean",
+      "Array",
+      "Object",
+      "Date",
+      "Vector",
+      "Matrix",
+      "Hash",
+      "File"
+    ],
+    "_index_shapes": [
+      true,
+      {
+        "_unique": true
+      },
+      {
+        "_unique": true,
+        "_primary": true
+      }
+    ],
+    "_schema_field_guidance": {
+      "_type": "Required. Must be one of the supported XDB field types.",
+      "_required": "Use true only for fields required to create a valid record.",
+      "_default": "Use for safe deterministic defaults such as [] or true.",
+      "_min_length": "Use for String validation.",
+      "_max_length": "Use for String validation.",
+      "_min": "Use for Number validation.",
+      "_max": "Use for Number validation.",
+      "_enum": "Use for controlled values.",
+      "_pattern": "Use for strict String format validation only when needed.",
+      "_immutable": "Use for fields that must not change after insert.",
+      "_embed": "Use true only for fields that should generate vectors.",
+      "_toFile": "Use true only when field content should be stored as file payload.",
+      "_index": "Use true or an index object when field must be searchable/indexed.",
+      "_auto_increment": "Avoid for identity. Only use for secondary counters."
+    },
+    "_index_rules": [
+      "_id is injected as primary unique index by XDBEntity.",
+      "Use { \"_unique\": true } for fields like username, email, slug, or external IDs.",
+      "Use true for non-unique indexed fields.",
+      "Use { \"_unique\": true, \"_primary\": true } only for explicit custom primary identity cases.",
+      "Do NOT use array position or row order as identity.",
+      "Unique indexes enforce duplicate protection.",
+      "Use normalized secondary fields for human-readable lookup."
+    ],
+    "_security_rules": [
+      "Passwords must use { \"_type\": \"Hash\" }.",
+      "Do NOT create password_hash as String unless explicitly required by an external legacy system.",
+      "Do NOT store access tokens, API keys, or secrets in XDB records.",
+      "Do NOT persist internal file paths, stack traces, adapter state, or debug dumps.",
+      "Persist only the minimum fields required by the user request."
+    ],
+    "_relationship_rules": [
+      "Use ObjectId fields for references to other entity records.",
+      "Reference fields should store target record GUID _id values.",
+      "For one-to-many relationships, use Array of GUID references or create a separate join/link entity.",
+      "Do NOT embed another full entity record unless explicitly requested."
+    ]
+  },
+
+  "_exports": {
+    "_response_shapes": [
+      {
+        "_name": "xdb_entity_root",
+        "_shape": {
+          "_entity": {
+            "_id": "entity-name",
+            "_title": "Entity Title",
+            "_description": "Entity description",
+            "_meta": {
+              "_version": 1
+            },
+            "_schema": {}
+          }
+        }
+      }
+    ],
+    "_index_shapes": [
+      true,
+      {
+        "_unique": true
+      },
+      {
+        "_unique": true,
+        "_primary": true
+      }
+    ]
+  },
+
+  "_patterns": [
+    {
+      "_name": "users_entity",
+      "_description": "System users entity with unique username/email and password Hash field.",
+      "_example": {
+        "_entity": {
+          "_id": "users",
+          "_title": "Users",
+          "_description": "System users entity",
+          "_meta": {
+            "_version": 1
+          },
+          "_schema": {
+            "username": {
+              "_type": "String",
+              "_required": true,
+              "_min_length": 3,
+              "_max_length": 32,
+              "_index": {
+                "_unique": true
+              }
+            },
+            "email": {
+              "_type": "String",
+              "_required": true,
+              "_index": {
+                "_unique": true
+              }
+            },
+            "password": {
+              "_type": "Hash",
+              "_required": true
+            },
+            "display_name": {
+              "_type": "String"
+            },
+            "roles": {
+              "_type": "Array",
+              "_default": []
+            },
+            "active": {
+              "_type": "Boolean",
+              "_default": true
+            },
+            "last_login_at": {
+              "_type": "Date"
+            }
+          }
+        }
+      }
+    },
+    {
+      "_name": "products_entity",
+      "_description": "Product catalog entity with indexed SKU/title and embeddable description.",
+      "_example": {
+        "_entity": {
+          "_id": "products",
+          "_title": "Products",
+          "_description": "Product catalog entity",
+          "_meta": {
+            "_version": 1
+          },
+          "_schema": {
+            "sku": {
+              "_type": "String",
+              "_required": true,
+              "_index": {
+                "_unique": true
+              }
+            },
+            "title": {
+              "_type": "String",
+              "_required": true,
+              "_index": true
+            },
+            "description": {
+              "_type": "String",
+              "_embed": true
+            },
+            "price": {
+              "_type": "Number",
+              "_min": 0
+            },
+            "active": {
+              "_type": "Boolean",
+              "_default": true
+            },
+            "tags": {
+              "_type": "Array",
+              "_default": [],
+              "_index": true
+            }
+          }
+        }
+      }
+    }
+  ],
+
+  "_canonical_examples": [
+    {
+      "_entity": {
+        "_id": "users",
+        "_title": "Users",
+        "_description": "System users entity",
+        "_meta": {
+          "_version": 1
+        },
+        "_schema": {
+          "username": {
+            "_type": "String",
+            "_required": true,
+            "_index": {
+              "_unique": true
+            }
+          },
+          "email": {
+            "_type": "String",
+            "_required": true,
+            "_index": {
+              "_unique": true
+            }
+          },
+          "password": {
+            "_type": "Hash",
+            "_required": true
+          }
+        }
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    "Returning TypeScript classes",
+    "Returning MongoDB schemas",
+    "Returning SQL DDL",
+    "Including records inside entity schema output",
+    "Mixing _entity with _view or _flow roots",
+    "Omitting root _entity._id",
+    "Adding _created_at manually",
+    "Adding _updated_at manually",
+    "Adding _id manually to _schema unless explicitly required",
+    "Using Number auto_increment as primary identity",
+    "Using password_hash as String for new entities",
+    "Storing secrets or tokens in entity records",
+    "Using channel IDs as canonical user identity",
+    {
+      "_bad": {
+        "_entity": {
+          "_title": "Users",
+          "_schema": {}
+        }
+      },
+      "_reason": "Root _entity._id is required."
+    },
+    {
+      "_bad": {
+        "_entity": {
+          "_id": "users",
+          "_schema": {
+            "_created_at": {
+              "_type": "Date"
+            }
+          }
+        }
+      },
+      "_reason": "_created_at is injected automatically by XDBEntity."
+    },
+    {
+      "_bad": {
+        "_entity": {
+          "_id": "users",
+          "_schema": {
+            "password_hash": {
+              "_type": "String"
+            }
+          }
+        }
+      },
+      "_reason": "New password/verifier fields must use Hash type."
+    },
+    {
+      "_bad": {
+        "_entity": {
+          "_id": "orders",
+          "_schema": {
+            "user": {
+              "_type": "Object"
+            }
+          }
+        }
+      },
+      "_reason": "References to other entity records should use ObjectId or explicit GUID reference fields, not embedded full records."
+    }
+  ],
+
+  "_notes": [
+    "This skill is for entity schema generation, not record creation.",
+    "XDBEntity injects canonical record _id, _created_at, and _updated_at unless explicitly overridden by a deeper layer contract.",
+    "The root entity definition still requires _entity._id.",
+    "Use entity-manager flow commands to create, find, update, or delete records."
+  ]
+}

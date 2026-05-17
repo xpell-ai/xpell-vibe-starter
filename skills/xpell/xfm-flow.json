@@ -1,0 +1,340 @@
+{
+  "_id": "xfm-flow",
+  "_title": "XFM FlowManager Rules",
+  "_version": "1.0.0",
+  "_active": true,
+  "_type": "flow-skill",
+  "_description": "Rules for defining deterministic FlowManager flows using declarative steps, commands, outputs, and path references.",
+  "_applies_to": ["vibe-ai", "xfm", "flow-manager", "flows", "flow-generation"],
+
+  "_requires": ["xpell-contract", "xpell-core"],
+
+  "_match": {
+    "_keywords": ["flow", "flows", "xfm", "flow-manager", "_flow", "_steps", "_command", "_output", "$step", "$event", "$xdata"],
+    "_requires_any": ["flow", "flows", "pipeline", "steps", "workflow", "automation"],
+    "_exclude_keywords": ["react", "vue", "angular"],
+    "_priority": 300
+  },
+
+  "_core_rules": [
+    "Return ONLY valid JSON.",
+    "Root must be { \"_flow\": { \"_id\": ..., \"_steps\": [...] } } when generating flows for Vibe AI.",
+    "Flows are declarative execution pipelines.",
+    "Every flow requires _id and _steps.",
+    "Every step should have a stable _id.",
+    "Use _command for executable operations.",
+    "FlowManager executes steps sequentially.",
+    "Flow outputs are written to XData through _output._to.",
+    "Use _value to extract or transform step results.",
+    "Use $step.<step-id> paths to reference previous step results.",
+    "Use $event.<field> to reference UI event payloads.",
+    "Use $xdata.<key> to reference XData values.",
+    "FlowManager does not execute JavaScript.",
+    "Do NOT generate JS functions, lambdas, async code, or scripts inside flows.",
+    "Flows must remain deterministic and declarative.",
+    "Use explicit _app_id, _env, and _entity for entity-manager commands.",
+    "Entity queries use _filter, not filter.",
+    "Entity create uses _data.",
+    "Entity update uses _filter and _updates.",
+    "_flow trigger fields belong in XUI view objects, not inside flow step definitions."
+  ],
+
+  "_priority_rules": [
+    "When the requested artifact is a FlowManager flow for Vibe AI, return only a _flow root.",
+    "Do NOT wrap a flow definition in _view.",
+    "Do NOT put XUI trigger _flow fields inside flow steps.",
+    "Use _command._module and _command._op for every executable step.",
+    "For entity-manager find operations, use _filter.",
+    "For entity-manager add/create operations, use _data.",
+    "For entity-manager update operations, use _filter and _updates.",
+    "For writing step results to XData, use _output._to._type:\"xdata\" and _output._to._key.",
+    "Use $event only for values passed from a UI flow trigger.",
+    "Use $step only for previous step results.",
+    "Use $xdata only for values already stored in XData."
+  ],
+
+  "_fields": {
+    "_flow_root_shape": {
+      "_flow": {
+        "_id": "flow-id",
+        "_steps": []
+      }
+    },
+    "_flow_structure": {
+      "_id": "Unique flow id.",
+      "_steps": "Ordered array of flow steps."
+    },
+    "_step_structure": {
+      "_id": "Stable step id.",
+      "_command": {
+        "_module": "Target module.",
+        "_op": "Target operation.",
+        "_params": "Operation params."
+      },
+      "_input": "Optional XData input mapping.",
+      "_output": "Optional XData output mapping.",
+      "_when": "Optional conditional execution."
+    },
+    "_output_rules": [
+      "_output._to._type currently supports xdata.",
+      "_output._to._key is the XData destination key.",
+      "_output._value can extract nested result values.",
+      "Without _value, the entire step result is stored."
+    ],
+    "_path_resolution": [
+      "$event.name",
+      "$event.value",
+      "$xdata.user:id",
+      "$step.find-users._result._records._data"
+    ],
+    "_entity_manager_params": {
+      "_app_id": "Application id.",
+      "_env": "Environment id, usually default.",
+      "_entity": "Entity name.",
+      "_filter": "Query filter for find/update/delete.",
+      "_data": "Create/add payload.",
+      "_updates": "Update payload."
+    }
+  },
+
+  "_exports": {
+    "_response_shapes": [
+      {
+        "_name": "vibe_flow_root",
+        "_shape": {
+          "_flow": {
+            "_id": "flow-id",
+            "_steps": []
+          }
+        }
+      },
+      {
+        "_name": "flow_step",
+        "_shape": {
+          "_id": "step-id",
+          "_command": {
+            "_module": "module-name",
+            "_op": "operation-name",
+            "_params": {}
+          }
+        }
+      },
+      {
+        "_name": "xdata_output",
+        "_shape": {
+          "_output": {
+            "_to": {
+              "_type": "xdata",
+              "_key": "namespace:key"
+            },
+            "_value": "$step.step-id._result"
+          }
+        }
+      }
+    ],
+    "_xdata_keys": []
+  },
+
+  "_patterns": [
+    {
+      "_name": "entity_find_to_xdata",
+      "_description": "Load entity records into XData.",
+      "_example": {
+        "_flow": {
+          "_id": "flow-get-users",
+          "_steps": [
+            {
+              "_id": "find-users",
+              "_command": {
+                "_module": "entity-manager",
+                "_op": "find",
+                "_params": {
+                  "_app_id": "vibe-app",
+                  "_env": "default",
+                  "_entity": "users",
+                  "_filter": {}
+                }
+              },
+              "_output": {
+                "_to": {
+                  "_type": "xdata",
+                  "_key": "users:raw"
+                },
+                "_value": "$step.find-users._result._records._data"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_name": "entity_create",
+      "_description": "Create entity record from UI event payload.",
+      "_example": {
+        "_flow": {
+          "_id": "flow-create-user",
+          "_steps": [
+            {
+              "_id": "create-user",
+              "_command": {
+                "_module": "entity-manager",
+                "_op": "add",
+                "_params": {
+                  "_app_id": "vibe-app",
+                  "_env": "default",
+                  "_entity": "users",
+                  "_data": {
+                    "username": "$event.username",
+                    "email": "$event.email"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_name": "conditional_step",
+      "_description": "Run step only when XData value matches.",
+      "_example": {
+        "_flow": {
+          "_id": "flow-admin-action",
+          "_steps": [
+            {
+              "_id": "check-admin",
+              "_when": {
+                "_type": "xdata",
+                "_key": "auth:is_admin",
+                "_equals": true
+              },
+              "_command": {
+                "_module": "entity-manager",
+                "_op": "find",
+                "_params": {
+                  "_app_id": "vibe-app",
+                  "_env": "default",
+                  "_entity": "users",
+                  "_filter": {}
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "_name": "xdata_filter_reference",
+      "_description": "Reference XData directly in command params.",
+      "_example": {
+        "_flow": {
+          "_id": "flow-load-profile",
+          "_steps": [
+            {
+              "_id": "load-profile",
+              "_command": {
+                "_module": "entity-manager",
+                "_op": "find",
+                "_params": {
+                  "_app_id": "vibe-app",
+                  "_env": "default",
+                  "_entity": "users",
+                  "_filter": {
+                    "_id": "$xdata.auth:user_id"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+
+  "_canonical_examples": [
+    {
+      "_flow": {
+        "_id": "flow-get-users",
+        "_steps": [
+          {
+            "_id": "find-users",
+            "_command": {
+              "_module": "entity-manager",
+              "_op": "find",
+              "_params": {
+                "_app_id": "vibe-app",
+                "_env": "default",
+                "_entity": "users",
+                "_filter": {}
+              }
+            },
+            "_output": {
+              "_to": {
+                "_type": "xdata",
+                "_key": "users:raw"
+              },
+              "_value": "$step.find-users._result._records._data"
+            }
+          }
+        ]
+      }
+    }
+  ],
+
+  "_anti_patterns": [
+    {
+      "_bad": {
+        "_module": "entity-manager",
+        "_op": "find",
+        "_params": {
+          "filter": {}
+        }
+      },
+      "_reason": "Canonical entity query param is _filter."
+    },
+    {
+      "_bad": {
+        "_command": "() => fetch('/users')"
+      },
+      "_reason": "Flows do not execute JavaScript."
+    },
+    {
+      "_bad": {
+        "_output": {
+          "_key": "users"
+        }
+      },
+      "_reason": "_output requires _to._type and _to._key."
+    },
+    {
+      "_bad": {
+        "_flow": "flow-id"
+      },
+      "_reason": "This is an XUI trigger field. Vibe flow artifacts must use root { \"_flow\": { \"_id\", \"_steps\" } }."
+    },
+    {
+      "_bad": {
+        "_view": {
+          "_id": "main",
+          "_type": "view",
+          "_flow": "flow-get-users"
+        }
+      },
+      "_reason": "View generation belongs to xui-core/xui-flow-trigger. Flow artifacts should use root _flow with _id and _steps."
+    },
+    "JavaScript functions",
+    "async/await",
+    "fetch()",
+    "axios",
+    "Promise chains",
+    "React hooks",
+    "manual WebSocket handling"
+  ],
+
+  "_notes": [
+    "Flow definitions belong to xfm-flow.",
+    "XUI objects trigger flows through xui-flow-trigger using root-level _flow fields on XUI objects.",
+    "For Vibe AI parser compatibility, generated flow artifacts should use root { \"_flow\": { ... } }.",
+    "Do not merge flow definitions and XUI trigger views in the same artifact unless the user explicitly asks for multiple artifacts."
+  ]
+}

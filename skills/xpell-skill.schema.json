@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "xpell-skill.schema.json",
+  "_title": "Xpell Vibe Skill Schema",
+  "type": "object",
+  "additionalProperties": true,
+
+  "required": [
+    "_id",
+    "_title",
+    "_version"
+  ],
+
+  "properties": {
+    "_id": {
+      "type": "string"
+    },
+
+    "_title": {
+      "type": "string"
+    },
+
+    "_version": {
+      "type": "string"
+    },
+
+    "_active": {
+      "type": "boolean",
+      "default": true
+    },
+
+    "_type": {
+      "type": "string",
+      "enum": [
+        "view-skill",
+        "flow-skill",
+        "entity-skill",
+        "runtime-api-skill",
+        "nano-command-pack",
+        "server-module-api",
+        "client-module-api",
+        "wormholes-protocol",
+        "xdata-skill",
+        "general"
+      ],
+      "default": "general"
+    },
+
+    "_description": {
+      "type": "string"
+    },
+
+    "_applies_to": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "_match": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "_keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "_requires_any": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "_requires_all": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "_exclude_keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "_priority": {
+          "type": "number",
+          "default": 0
+        }
+      }
+    },
+
+    "_core_rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "_priority_rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "_rules": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+
+    "_fields": {
+      "type": "object",
+      "additionalProperties": true
+    },
+
+    "_exports": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "_xui_objects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "_xui_fields": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "_nano_commands": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          }
+        },
+
+        "_modules": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/module"
+          }
+        },
+
+        "_server_ops": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          }
+        },
+
+        "_client_ops": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          }
+        },
+
+        "_wormholes_events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/event"
+          }
+        },
+
+        "_xdata_keys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+
+        "_response_shapes": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+
+    "_patterns": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pattern"
+      }
+    },
+
+    "_canonical_examples": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+
+    "_anti_patterns": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "object",
+            "required": [
+              "_bad",
+              "_reason"
+            ],
+            "properties": {
+              "_bad": {},
+              "_reason": {
+                "type": "string"
+              }
+            },
+            "additionalProperties": true
+          }
+        ]
+      }
+    },
+
+    "_response_shapes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+
+    "_notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+
+  "$defs": {
+    "command": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "_name"
+      ],
+      "properties": {
+        "_name": {
+          "type": "string"
+        },
+
+        "_scope": {
+          "type": "string"
+        },
+
+        "_description": {
+          "type": "string"
+        },
+
+        "_params": {
+          "type": "object",
+          "additionalProperties": true
+        },
+
+        "_example": {
+          "type": "object"
+        }
+      }
+    },
+
+    "module": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "_name"
+      ],
+      "properties": {
+        "_name": {
+          "type": "string"
+        },
+
+        "_scope": {
+          "type": "string",
+          "enum": [
+            "server",
+            "client",
+            "shared"
+          ]
+        },
+
+        "_description": {
+          "type": "string"
+        },
+
+        "_ops": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/command"
+          }
+        }
+      }
+    },
+
+    "event": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "_name"
+      ],
+      "properties": {
+        "_name": {
+          "type": "string"
+        },
+
+        "_scope": {
+          "type": "string"
+        },
+
+        "_description": {
+          "type": "string"
+        },
+
+        "_payload": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+
+    "pattern": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "_name",
+        "_example"
+      ],
+      "properties": {
+        "_name": {
+          "type": "string"
+        },
+
+        "_description": {
+          "type": "string"
+        },
+
+        "_example": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
