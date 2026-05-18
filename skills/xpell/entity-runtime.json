@@ -5,7 +5,7 @@
   "_active": true,
   "_type": "runtime-api-skill",
   "_description": "Rules for declarative Xpell entity runtime operations using entity-manager, entity-client, XResponse shapes, XData reactive state, and entity sync/cache boundaries.",
-  "_applies_to": ["vibe-ai", "xdb", "entity-runtime", "entity-manager", "entity-client", "xdb-sync-manager"],
+  "_applies_to": ["xvibe", "xdb", "entity-runtime", "entity-manager", "entity-client", "xdb-sync-manager"],
 
   "_requires": ["xpell-contract", "xpell-core", "xdb-entity"],
 

@@ -5,7 +5,7 @@
   "_active": true,
   "_type": "view-skill",
   "_description": "Rules for reactive XUI data binding using _data_source and _on_data.",
-  "_applies_to": ["@xpell/ui", "xui", "data-binding", "xdata", "vibe-ai"],
+  "_applies_to": ["@xpell/ui", "xui", "data-binding", "xdata", "xvibe"],
 
   "_match": {
     "_keywords": ["data", "binding", "xdata", "_data_source", "_on_data", "reactive", "render data"],

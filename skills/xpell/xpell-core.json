@@ -7,7 +7,7 @@
   "_description": "Vibe AI generation rules for @xpell/core runtime behavior: XpellEngine, XModule, XObject, XData, XDataModule, XEM, commands, nano-commands, runtime accessor injection, and platform-neutral execution.",
   "_applies_to": [
     "@xpell/core",
-    "vibe-ai",
+    "xvibe",
     "runtime",
     "commands",
     "xmodule",
@@ -286,7 +286,7 @@
         "_params": {
           "key": "ui:status",
           "value": "ready",
-          "source": "vibe-ai"
+          "source": "xvibe"
         }
       }
     },

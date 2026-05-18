@@ -5,7 +5,7 @@
   "_active": true,
   "_type": "view-skill",
   "_description": "Rules for XUI event handlers using _on, lifecycle hooks, _xem signals, and data-only nano-command handlers.",
-  "_applies_to": ["@xpell/ui", "xui", "events", "handlers", "nano-commands", "vibe-ai"],
+  "_applies_to": ["@xpell/ui", "xui", "events", "handlers", "nano-commands","xvibe"],
 
   "_match": {
     "_keywords": ["event", "events", "click", "change", "keyup", "_on", "_on_mount", "_on_data", "_xem", "handler"],

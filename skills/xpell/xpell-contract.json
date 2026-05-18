@@ -6,7 +6,7 @@
   "_type": "general",
   "_description": "Always-loaded base contract for Vibe AI generation across Xpell views, flows, entities, commands, modules, and skills.",
   "_applies_to": [
-    "vibe-ai",
+    "xvibe",
     "xpell",
     "xui",
     "flows",
@@ -19,7 +19,7 @@
   "_match": {
     "_keywords": [
       "xpell",
-      "vibe",
+      "xvibe",
       "view",
       "flow",
       "entity",
@@ -32,7 +32,7 @@
     ],
     "_requires_any": [
       "xpell",
-      "vibe",
+      "xvibe",
       "view",
       "flow",
       "entity",

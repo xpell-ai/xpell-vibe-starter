@@ -5,7 +5,7 @@
   "_active": true,
   "_type": "entity-skill",
   "_description": "Rules for generating XDB entity definitions for Vibe AI using root _entity, schema fields, indexes, relationships, and security-safe persistence.",
-  "_applies_to": ["vibe-ai", "xdb", "entity", "entity-generation", "entity-manager"],
+  "_applies_to": ["xvibe", "xdb", "entity", "entity-generation", "entity-manager"],
 
   "_requires": ["xpell-contract", "xpell-core"],
 

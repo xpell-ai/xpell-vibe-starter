@@ -1,22 +1,9 @@
-import { _x, _xem, _xlog, Wormholes, XModule, XUI, XUIRuntime, _xvm } from "@xpell/ui";
+import { _x, _xem, _xlog, Wormholes, XModule, XUI, XUIRuntime, _xvm, XDB } from "@xpell/ui";
 import { VibeEditor } from "./editor/VibeEditor";
 let _vibe_listener_registered = false;
 
 const editor = new VibeEditor();
 
-class VibeAIProxyModule extends XModule {
-  constructor() {
-    super({ _name: "vibe-ai" });
-  }
-
-  async _generate_view(xcmd: any) {
-    return Wormholes.sendXcmd({
-      _module: "vibe-ai",
-      _op: "generate_view",
-      _params: xcmd?._params ?? {},
-    });
-  }
-}
 
 const main = async () => {
   try {
@@ -26,10 +13,18 @@ const main = async () => {
     /* Load runtime + app                                             */
     /* -------------------------------------------------------------- */
 
-    _x.loadModule(new VibeAIProxyModule());
+    const saved_app = XDB.getString("xvibe.active_app") as string | undefined;
+
+    const app_id =
+      typeof saved_app === "string" &&
+        saved_app.trim().length > 0
+        ? saved_app
+        : "vibe-system";
+
+      _xlog.log("[vibe-client] loading app app_id:", app_id,saved_app);
 
     const client = await XUIRuntime.loadApp({
-      app_id: "vibe-system",
+      app_id: app_id,
       env: "default",
       wormhole_url: "ws://localhost:3000/wh/v2",
 
@@ -64,6 +59,28 @@ const main = async () => {
         view: payload?._view
       });
     });
+
+    _xem.on("vibe:open-app", async (data) => {
+
+      _xlog.log(
+        "[vibe-client] loading app",
+        {
+          _app_id: data._app_id,
+          _env: data._env
+        }
+      );
+
+      await _x.execute({
+        _module: "xvm",
+        _op: "load_app",
+        _params: {
+          _app_id: data._app_id,
+          _env: data._env
+        }
+      });
+
+    });
+
 
     /* -------------------------------------------------------------- */
     /* ✅ Prompt handler (FIXED)                                      */
@@ -106,7 +123,7 @@ const main = async () => {
                 : null;
             _xlog.log("current view", current_view_json);
             await _x.execute({
-              _module: "vibe-ai",
+              _module: "xvibe",
               _op: "generate_view",
               _params: {
                 prompt: value,
@@ -129,6 +146,36 @@ const main = async () => {
       _xem.on("vibe:prompt:send", () => {
         console.log("🔥 EVENT RECEIVED");
       });
+
+      _xem.on(
+        "vibe:open-app",
+        async (payload: any) => {
+          try {
+            const app_id = payload?._app_id;
+
+            if (!app_id) {
+              _xlog.warn("[vibe-client] missing _app_id");
+              return;
+            }
+
+            _xlog.log("[vibe-client] loading app", {
+              _app_id: app_id
+            });
+
+            await client.loadApp({
+              _app_id: app_id,
+              _env: "default"
+            });
+
+          } catch (err) {
+            _xlog.error(
+              "[vibe-client] loadApp failed",
+              err
+            );
+          }
+        },
+        { _owner: "vibe-client" }
+      );
     }
     /* -------------------------------------------------------------- */
     /* Editor                                                         */

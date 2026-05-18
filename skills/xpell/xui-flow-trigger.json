@@ -5,7 +5,7 @@
   "_active": true,
   "_type": "view-skill",
   "_description": "Rules for triggering FlowManager flows from XUI objects using root-level _flow and optional _flow_event.",
-  "_applies_to": ["@xpell/ui", "xui", "flow-trigger", "flow-manager", "vibe-ai"],
+  "_applies_to": ["@xpell/ui", "xui", "flow-trigger", "flow-manager", "xvibe"],
 
   "_requires": ["xui-core", "xfm-flow"],
 

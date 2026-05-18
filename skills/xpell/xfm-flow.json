@@ -5,7 +5,7 @@
   "_active": true,
   "_type": "flow-skill",
   "_description": "Rules for defining deterministic FlowManager flows using declarative steps, commands, outputs, and path references.",
-  "_applies_to": ["vibe-ai", "xfm", "flow-manager", "flows", "flow-generation"],
+  "_applies_to": ["xvibe", "xfm", "flow-manager", "flows", "flow-generation"],
 
   "_requires": ["xpell-contract", "xpell-core"],
 

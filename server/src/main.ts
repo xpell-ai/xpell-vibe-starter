@@ -2,7 +2,7 @@ import { _x, _xlog, XNode, _xai } from "@xpell/node";
 import { MockProvider } from "@xpell/xai-providers/mock";
 import { AzureProvider } from "@xpell/xai-providers/azure";
 import "dotenv/config";
-import { VibeAIEngineModule } from "./modules/vibe-ai/VibeAIEngineModule.js";
+// import { VibeAIEngineModule } from "./modules/vibe-ai/VibeAIEngineModule.js";
 import { VibeModule } from "./modules/vibe/VibeModule.js";
 import { XTestModule } from "./modules/Test/XTest.js";
 
@@ -59,11 +59,8 @@ async function main() {
   try {
     _x._verbose = true;
     _xlog._debug = true;
-    await _x.loadModuleAsync(new VibeModule());
-    await _x.loadModuleAsync(new VibeAIEngineModule());
-    await _x.loadModuleAsync(new XTestModule());
     const node = new XNode();
-
+    
     await node.start({
       _work_folder: "./work",
       _system_xapps_path: "./system-xapps",
@@ -76,7 +73,9 @@ async function main() {
         _type: "fs"
       },
     });
-
+    
+    await _x.loadModuleAsync(new VibeModule());
+    await _x.loadModuleAsync(new XTestModule());
     // await bootstrap_default_app();
     _xai.registerProvider(
       "azure",

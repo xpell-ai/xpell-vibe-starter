@@ -1,0 +1,42 @@
+{
+  "_id": "view-generation-result",
+  "_type": "view",
+  "style": "position:absolute;top:10%;left:10%;right:10%;bottom:10%;background:#111;border:1px solid #333;padding:20px;display:flex;flex-direction:column;gap:10px;z-index:9999;",
+  "_children": [
+    {
+      "_type": "label",
+      "_text": "Generated App"
+    },
+    {
+      "_type": "textarea",
+      "_data_source": "vibe:last_generation_json",
+      "rows": 20,
+      "style": "flex:1;width:100%;"
+    },
+    {
+      "_type": "view",
+      "style": "display:flex;gap:10px;",
+      "_children": [
+        {
+          "_module": "xem",
+          "_op": "fire",
+          "_params": {
+            "event": "vibe:open-app",
+            "payload": {
+              "_app_id": "generated-app"
+            }
+          }
+        },
+        {
+          "_type": "button",
+          "_text": "Close",
+          "_on": {
+            "click": {
+              "_op": "hide"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

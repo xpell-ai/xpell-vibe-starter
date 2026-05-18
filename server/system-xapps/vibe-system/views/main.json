@@ -12,11 +12,40 @@
           "_text": "What do you want to build?"
         },
         {
+          "_type": "text",
+          "_id": "app-id",
+          "rows": 5,
+          "style": "width:100%;background:#222;color:white;padding:10px;border:1px solid #333;",
+          "placeholder": "App id: e.g. todo-app, game, etc.",
+          "_text":"my-app",
+          "_on": {
+            "change": {
+              "_module": "xd",
+              "_op": "set",
+              "_params": {
+                "key": "vibe.app_id",
+                "value": "$event.target.value",
+                "_debug": true
+              }
+            }
+          }
+        },
+        {
           "_type": "textarea",
           "_id": "prompt-input",
-          "_data_source": "vibe:prompt",
-          "_on_data": {
-            "_op": "set-text-from-data"
+          "rows": 5,
+          "style": "width:100%;background:#222;color:white;padding:10px;border:1px solid #333;",
+          "placeholder": "E.g. A todo app with React, a game with Phaser, etc.",
+          "_on": {
+            "change": {
+              "_module": "xd",
+              "_op": "set",
+              "_params": {
+                "key": "vibe.prompt",
+                "value": "$event.target.value",
+                "_debug": true
+              }
+            }
           }
         },
         {
@@ -25,7 +54,8 @@
           "_flow": {
             "_id": "flow-generate-app",
             "_payload": {
-              "prompt": "$xdata.vibe:prompt"
+              "_prompt": "$xdata.vibe.prompt",
+              "_app_id": "$xdata.vibe.app_id"
             }
           }
         }
