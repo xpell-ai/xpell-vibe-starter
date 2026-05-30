@@ -17,6 +17,6 @@
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@xpell/core": "workspace:*"
+    "@xpell/core": "^2.0.0"
   }
 }

@@ -22,7 +22,7 @@
     "build": "tsc -p ."
   },
   "peerDependencies": {
-    "@xpell/node": "workspace:*"
+    "@xpell/node": "^2.0.0"
   },
   "devDependencies": {
     "typescript": "^5.9.3"

@@ -1,10 +1,10 @@
 {
   "_id": "xui-core",
   "_title": "XUI core generation rules",
-  "_version": "1.0.0",
+  "_version": "1.1.0",
   "_active": true,
   "_type": "view-skill",
-  "_description": "Core rules for generating valid Xpell XUI JSON views.",
+  "_description": "Core rules for generating valid semantic Xpell XUI JSON views.",
   "_applies_to": [
     "@xpell/ui",
     "xui",
@@ -13,32 +13,31 @@
   ],
   "_match": {
     "_keywords": [
+      "ui",
       "xui",
       "view",
-      "ui",
+      "layout",
       "screen",
       "page",
-      "layout",
-      "form",
+      "website",
+      "landing page",
       "button",
-      "input",
       "label",
-      "xhtml"
+      "input",
+      "textarea",
+      "form",
+      "field",
+      "list",
+      "card",
+      "grid",
+      "stack",
+      "toolbar",
+      "style-sheet",
+      "dashboard"
     ],
-    "_requires_any": [
-      "ui",
-      "view",
-      "xui",
-      "screen",
-      "page",
-      "layout",
-      "form"
-    ],
-    "_exclude_keywords": [
-      "react",
-      "vue"
-    ],
-    "_priority": 100
+    "_artifact_types": [
+      "view"
+    ]
   },
   "_core_rules": [
     "Return ONLY valid JSON.",
@@ -48,21 +47,14 @@
     "Prefer concrete XUI wrappers over raw XHTML.",
     "Use xhtml ONLY if no wrapper or semantic alias exists.",
     "Runtime-managed fields must start with '_' and use snake_case.",
+    "Prefer semantic fields such as _variant, _tone, _size, _density, and _elevation instead of raw class/style.",
+    "Use _theme only at app/view root level when generating themed apps.",
+    "Do NOT use raw style or class unless explicitly requested.",
     "Use _type:\"textarea\" for textarea controls. Do NOT emulate textarea with input/type attributes.",
-    "Do NOT use _attributes unless explicitly requested.",
-    "Do NOT wrap DOM fields inside _attributes.",
     "Use semantic HTML aliases like section, nav, h1, p, ul, li only when they improve structure.",
-    "Prefer XUI wrappers for controls and common UI elements.",
-    "Use svg/circle/rect/path/etc. only for SVG graphics, not normal layout."
-  ],
-  "_priority_rules": [
-    "For application UI layout use _type:\"view\" unless a semantic alias is explicitly useful.",
-    "For visible text in normal UI controls prefer _type:\"label\" over p/span/h1 unless heading/semantic structure is requested.",
-    "For clickable actions prefer _type:\"button\" over a/link unless navigation/link behavior is requested.",
-    "For text areas always use _type:\"textarea\"."
+    "Note: _type:\"section\" is an HTML alias. Dashboard section component is _type:\"xsection\"."
   ],
   "_fields": {
-    "_core_rule": "Fields starting with '_' are processed by Xpell runtime. Fields without '_' are passed directly to DOM.",
     "_xpell_fields": [
       "_id",
       "_type",
@@ -73,193 +65,36 @@
       "_on_data",
       "_data_source",
       "_flow",
-      "_flow_event"
+      "_flow_event",
+      "_theme",
+      "_variant",
+      "_tone",
+      "_size",
+      "_density",
+      "_elevation",
+      "_data_output",
+      "_update_data_source_event"
     ],
     "_dom_fields": [
       "placeholder",
       "type",
-      "style",
-      "class",
       "rows",
       "src",
       "href",
       "value",
       "name"
     ],
-    "_xui_core_objects": {
-      "_preferred": [
-        "view",
-        "label",
-        "link",
-        "button",
-        "text",
-        "password",
-        "input",
-        "textarea",
-        "video",
-        "image",
-        "list",
-        "form",
-        "webcam",
-        "svg"
-      ],
-      "_html_aliases": [
-        "div",
-        "header",
-        "aside",
-        "main",
-        "section",
-        "article",
-        "nav",
-        "footer",
-        "span",
-        "p",
-        "a",
-        "ul",
-        "ol",
-        "li",
-        "h1",
-        "h2",
-        "h3",
-        "h4",
-        "h5",
-        "h6"
-      ],
-      "_svg_objects": [
-        "circle",
-        "rect",
-        "ellipse",
-        "line",
-        "polyline",
-        "polygon",
-        "path"
-      ],
-      "_fallback": [
-        "xhtml"
-      ]
-    },
-    "_xhtml_fallback": {
-      "_rule": "Use only if no XUI wrapper or semantic alias exists.",
-      "_example": {
-        "_type": "xhtml",
-        "_html_tag": "span",
-        "_text": "hello"
-      }
-    }
-  },
-  "_exports": {
-    "_xui_objects": [
-      "view",
-      "div",
-      "header",
-      "aside",
-      "main",
-      "section",
-      "article",
-      "nav",
-      "footer",
-      "span",
-      "p",
-      "a",
-      "ul",
-      "ol",
-      "li",
-      "h1",
-      "h2",
-      "h3",
-      "h4",
-      "h5",
-      "h6",
-      "label",
-      "link",
-      "button",
-      "text",
-      "password",
-      "input",
-      "textarea",
-      "video",
-      "image",
-      "list",
-      "form",
-      "webcam",
-      "xhtml",
-      "svg",
-      "circle",
-      "rect",
-      "ellipse",
-      "line",
-      "polyline",
-      "polygon",
-      "path"
-    ],
-    "_xui_fields": [
-      "_id",
-      "_type",
-      "_text",
-      "_children",
-      "_on",
-      "_on_mount",
-      "_on_data",
-      "_data_source",
-      "_flow",
-      "_flow_event"
+    "_escape_hatch_fields": [
+      "class",
+      "style"
     ]
   },
-  "_patterns": [
-    {
-      "_name": "login_form",
-      "_description": "Basic login form using XUI wrappers.",
-      "_example": {
-        "_view": {
-          "_id": "main",
-          "_type": "view",
-          "_children": [
-            {
-              "_type": "label",
-              "_text": "Login"
-            },
-            {
-              "_type": "input",
-              "_id": "username",
-              "placeholder": "Username"
-            },
-            {
-              "_type": "input",
-              "_id": "password",
-              "placeholder": "Password",
-              "type": "password"
-            },
-            {
-              "_type": "button",
-              "_text": "Login"
-            }
-          ]
-        }
-      }
-    }
-  ],
-  "_canonical_examples": [
-    {
-      "_type": "input",
-      "_id": "email",
-      "placeholder": "Enter email",
-      "type": "email",
-      "class": "input",
-      "style": "width:100%"
-    },
-    {
-      "_type": "textarea",
-      "_id": "message",
-      "placeholder": "Enter message",
-      "rows": 4,
-      "class": "textarea"
-    }
-  ],
   "_anti_patterns": [
     "HTML documents",
     "CSS blocks",
     "JavaScript functions",
     "React/Vue syntax",
+    "Using class/style as the primary styling system",
     {
       "_bad": {
         "_type": "input",
@@ -269,17 +104,10 @@
     },
     {
       "_bad": {
-        "_attributes": {
-          "placeholder": "Name"
-        }
+        "_type": "card",
+        "class": "bg-zinc-900 rounded-xl p-4"
       },
-      "_reason": "DOM fields should be direct fields, not wrapped in _attributes."
+      "_reason": "Use semantic fields like _variant, _tone, _size, _density instead of framework classes."
     }
-  ],
-  "_notes": [
-    "XUI views are JSON-driven and object-based.",
-    "Concrete wrappers should be used before xhtml aliases.",
-    "Stored or agent-editable handlers should be data-only nano-command forms.",
-    "_flow and _flow_event are recognized core fields, but detailed flow semantics may be defined by a separate flow skill."
   ]
 }

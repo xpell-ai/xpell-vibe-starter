@@ -1,0 +1,1477 @@
+{
+    "_runtime": {
+        "_engine_id": "c827264b-ab8c-4d76-a395-aee5a3e8657c",
+        "_version": "0.0.1"
+    },
+    "_skills": [
+        {
+            "_id": "xmodule",
+            "_title": "XModule Runtime Contract",
+            "_version": "1.0.0",
+            "_active": true,
+            "_type": "runtime-api-skill",
+            "_description": "Base runtime module contract for object ownership, object packs, and executable underscore-prefixed commands.",
+            "_core_rules": [
+                "Every module must have a unique _name.",
+                "Modules expose commands through methods prefixed with underscore.",
+                "Command names remove the leading underscore and convert dashes to underscores internally.",
+                "Modules own and create registered XObject classes.",
+                "Do not mutate another module's objects directly."
+            ]
+        },
+        {
+            "_id": "xobject",
+            "_title": "XObject Core Runtime Contract",
+            "_version": "1.0.0",
+            "_active": true,
+            "_type": "runtime-api-skill",
+            "_description": "Base runtime object for identity, typing, composition, lifecycle hooks, events, data binding, and nano-command execution.",
+            "_fields": {
+                "_id": "Unique object id.",
+                "_type": "Registered runtime object type.",
+                "_name": "Optional object name.",
+                "_children": "Child objects/data.",
+                "_data_source": "XData key to bind this object to.",
+                "_on": "Event handlers map.",
+                "_once": "One-time event handlers map.",
+                "_on_create": "Lifecycle handler after object creation.",
+                "_on_mount": "Lifecycle handler after mount.",
+                "_on_frame": "Frame lifecycle handler.",
+                "_on_data": "Data-source lifecycle handler.",
+                "_process_frame": "Enable/disable frame processing.",
+                "_process_data": "Enable/disable data-source processing.",
+                "_debug": "Enable object debug logs."
+            },
+            "_exports": {
+                "_xui_fields": [
+                    "_id",
+                    "_type",
+                    "_name",
+                    "_children",
+                    "_data_source",
+                    "_on",
+                    "_once",
+                    "_on_create",
+                    "_on_mount",
+                    "_on_frame",
+                    "_on_data",
+                    "_process_frame",
+                    "_process_data",
+                    "_debug"
+                ]
+            },
+            "_core_rules": [
+                "All Xpell runtime objects inherit this contract.",
+                "Generated object JSON must be data-only.",
+                "Do not generate JavaScript functions.",
+                "Use _children for composition.",
+                "Use _on/_once with nano-command strings or data-only command objects."
+            ],
+            "_notes": [
+                "Runtime methods include parse, append, run, execute, bindDataSource, unbindDataSource, toXData, dispose, and removeChild.",
+                "Most prompts should use this skill as a compact dependency summary, not full context."
+            ]
+        }
+    ],
+    "_modules": [
+        {
+            "_name": "xui",
+            "_skills": [
+                {
+                    "_id": "xui",
+                    "_title": "XUI Runtime Module",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "client-module-api",
+                    "_requires": [
+                        "xmodule",
+                        "xuiobject"
+                    ],
+                    "_description": "Client-side UI module for creating, mounting, removing, theming, and managing DOM-backed XUI objects.",
+                    "_core_rules": [
+                        "XUI creates and mounts UI objects.",
+                        "XUI does not own navigation; XVM controls active views.",
+                        "XUI.add() and XUI.mount() must not call show().",
+                        "Use XUI object _type values, not raw HTML unless needed.",
+                        "Use themes and semantic fields instead of raw style/class."
+                    ],
+                    "_exports": {
+                        "_modules": [
+                            {
+                                "_name": "xui",
+                                "_scope": "client",
+                                "_description": "Client-side UI module for creating, mounting, removing, theming, and managing DOM-backed XUI objects.",
+                                "_ops": [
+                                    {
+                                        "_name": "register-theme",
+                                        "_scope": "module",
+                                        "_description": "Register a named XUI theme token object.",
+                                        "_params": {
+                                            "_name": "Theme name.",
+                                            "_tokens": "CSS variable token map."
+                                        }
+                                    },
+                                    {
+                                        "_name": "apply-theme",
+                                        "_scope": "module",
+                                        "_description": "Apply a named CSS theme or inline token theme.",
+                                        "_params": {
+                                            "_theme": "Theme name or CSS variable token map."
+                                        }
+                                    },
+                                    {
+                                        "_name": "create-player",
+                                        "_scope": "module",
+                                        "_description": "Create the root XUI player element.",
+                                        "_params": {
+                                            "_id": "Player id. Default xplayer.",
+                                            "class": "Optional CSS class.",
+                                            "_parent_element": "Optional parent DOM element id.",
+                                            "_set_as_main_player": "Whether to set as main XUI player.",
+                                            "_theme": "Optional theme name or token map."
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "_objects": [
+                {
+                    "_id": "view",
+                    "_title": "XView",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Basic XUI container view. Used as a generic layout/root container for child UI objects.",
+                    "_fields": {
+                        "_children": "Child UI objects.",
+                        "_theme": "Optional theme when used as root view.",
+                        "class": "Optional CSS class. Defaults to xview."
+                    },
+                    "_core_rules": [
+                        "Use view as a generic container.",
+                        "Use _children for nested UI structure.",
+                        "Do not use view when a more semantic object exists."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "view",
+                            "_id": "main",
+                            "_children": []
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "xhtml",
+                    "_title": "XHTML",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Generic raw HTML wrapper object for unsupported or custom HTML tags.",
+                    "_fields": {
+                        "_html_tag": "HTML tag name to render, e.g. div, span, article, section, nav.",
+                        "_children": "Nested UI objects or XHTML content.",
+                        "_text": "Optional text content."
+                    },
+                    "_core_rules": [
+                        "Prefer semantic XUI objects when available.",
+                        "Use xhtml only when no dedicated XUI wrapper exists.",
+                        "Use _html_tag to select the rendered HTML tag.",
+                        "Do not use xhtml as the default container type."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "xhtml",
+                            "_html_tag": "article",
+                            "_children": []
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "link",
+                    "_title": "XLink",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Hyperlink UI object rendered as an HTML anchor element.",
+                    "_fields": {
+                        "href": "Link URL.",
+                        "target": "Browser target such as _blank.",
+                        "rel": "Relationship attribute.",
+                        "download": "Enable browser download behavior.",
+                        "_text": "Visible link text."
+                    },
+                    "_core_rules": [
+                        "Use link for navigation URLs and external resources.",
+                        "Use button for actions.",
+                        "Use target:'_blank' for external links when needed.",
+                        "Use rel:'noopener noreferrer' with _blank for security."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "link",
+                            "href": "https://xpell.ai",
+                            "target": "_blank",
+                            "_text": "Open Xpell"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "label",
+                    "_title": "XLabel",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Text label UI object rendered as an HTML label element.",
+                    "_fields": {
+                        "_text": "Visible label text.",
+                        "for": "Optional id of associated input/control."
+                    },
+                    "_core_rules": [
+                        "Use label for short text and form labels.",
+                        "Use for when connecting label to an input id.",
+                        "Use button or link for interactive actions."
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "button",
+                    "_title": "XButton",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Clickable button UI object rendered as an HTML button element.",
+                    "_fields": {
+                        "_text": "Visible button text.",
+                        "type": "Button type: button, submit, or reset.",
+                        "disabled": "Disable the button.",
+                        "_on": "Use _on.click for local nano-command actions.",
+                        "_flow": "Use _flow for app/business actions.",
+                        "_flow_event": "Event that triggers _flow. Usually click."
+                    },
+                    "_core_rules": [
+                        "Use button for actions.",
+                        "Use link for navigation URLs.",
+                        "Use type:'submit' inside forms when submitting a form.",
+                        "Prefer _flow for business actions.",
+                        "Use _on.click for local UI actions."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "button",
+                            "_text": "Login",
+                            "type": "submit",
+                            "_variant": "primary",
+                            "_flow": {
+                                "_id": "login",
+                                "_payload": {
+                                    "username": "$xdata.login.username",
+                                    "password": "$xdata.login.password"
+                                }
+                            }
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "text",
+                    "_title": "XTextField",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Single-line text input rendered as an HTML input element.",
+                    "_fields": {
+                        "_text": "Initial input value.",
+                        "value": "Input value.",
+                        "placeholder": "Placeholder text.",
+                        "name": "Form/input name.",
+                        "type": "Input type. Defaults to text.",
+                        "autocomplete": "Browser autocomplete hint.",
+                        "required": "Native required flag.",
+                        "disabled": "Disable input.",
+                        "readonly": "Read-only input."
+                    },
+                    "_core_rules": [
+                        "Use text for single-line text input.",
+                        "Use textarea for multiline text.",
+                        "Use password for password input.",
+                        "Use name when input belongs to a form.",
+                        "Use _data_source when binding input value to XData."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "text",
+                            "name": "username",
+                            "placeholder": "Enter username"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "password",
+                    "_title": "XPassword",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "text"
+                    ],
+                    "_description": "Password input rendered as an HTML input element with type='password'.",
+                    "_fields": {
+                        "_text": "Initial password value. Avoid using for real passwords.",
+                        "value": "Password input value. Avoid hardcoding real passwords.",
+                        "placeholder": "Placeholder text.",
+                        "name": "Form/input name.",
+                        "autocomplete": "Browser autocomplete hint, usually current-password or new-password.",
+                        "required": "Native required flag.",
+                        "disabled": "Disable input.",
+                        "readonly": "Read-only input.",
+                        "_data_source": "Optional XData key for password value.",
+                        "_update_data_source_on_change": "When true, updates _data_source in XData on input/change."
+                    },
+                    "_core_rules": [
+                        "Use password for password fields.",
+                        "Do not use text with type:'password'.",
+                        "Do not hardcode real password values in generated JSON.",
+                        "Use autocomplete:'current-password' for login forms.",
+                        "Use autocomplete:'new-password' for signup/reset forms."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "password",
+                            "name": "password",
+                            "placeholder": "Enter password",
+                            "autocomplete": "current-password",
+                            "_data_source": "login.password",
+                            "_update_data_source_on_change": true
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "input",
+                    "_title": "XInput",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Generic HTML input field base object for text, password, checkbox, radio, and other input types.",
+                    "_fields": {
+                        "_text": "Initial input value.",
+                        "value": "Current input value.",
+                        "_input_type": "HTML input type.",
+                        "placeholder": "Placeholder text.",
+                        "name": "Input/form name.",
+                        "autocomplete": "Browser autocomplete hint.",
+                        "required": "Native required flag.",
+                        "disabled": "Disable input.",
+                        "readonly": "Read-only input.",
+                        "_data_source": "Optional XData key bound to the input value.",
+                        "_update_data_source_on_change": "When true, updates _data_source whenever the input value changes.",
+                        "_update_data_source_event": "DOM event used for updates. Usually input or change."
+                    },
+                    "_core_rules": [
+                        "Use input as a generic HTML input abstraction.",
+                        "Prefer semantic child types like text or password when possible.",
+                        "Use _data_source for reactive form state.",
+                        "Use _update_data_source_on_change for realtime XData synchronization."
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "textarea",
+                    "_title": "XTextArea",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "input"
+                    ],
+                    "_description": "Multiline text input rendered as an HTML textarea element.",
+                    "_fields": {
+                        "rows": "Visible textarea rows.",
+                        "cols": "Visible textarea columns.",
+                        "placeholder": "Placeholder text.",
+                        "maxlength": "Maximum text length.",
+                        "_data_source": "Optional XData binding key.",
+                        "_update_data_source_on_change": "Update XData while typing."
+                    },
+                    "_core_rules": [
+                        "Use textarea for multiline text.",
+                        "Use text for single-line text.",
+                        "Use _data_source for reactive content."
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "video",
+                    "_title": "XVideo",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Video UI object rendered as an HTML video element.",
+                    "_fields": {
+                        "src": "Video URL/source.",
+                        "controls": "Show browser video controls.",
+                        "autoplay": "Autoplay video when allowed by browser.",
+                        "muted": "Mute video.",
+                        "loop": "Loop playback.",
+                        "poster": "Poster image URL.",
+                        "width": "Optional video width.",
+                        "height": "Optional video height.",
+                        "preload": "Browser preload mode: none, metadata, or auto.",
+                        "_children": "Optional source/track children only when needed."
+                    },
+                    "_core_rules": [
+                        "Use video for video playback.",
+                        "Use controls:true for user-controlled playback.",
+                        "Autoplay usually requires muted:true.",
+                        "Use poster for preview image when available.",
+                        "Do not use video as a generic container."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "video",
+                            "src": "/intro.mp4",
+                            "controls": true,
+                            "poster": "/intro-poster.jpg"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "image",
+                    "_title": "XImage",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Image UI object rendered as an HTML img element.",
+                    "_fields": {
+                        "src": "Image URL/source.",
+                        "alt": "Accessible alternative text.",
+                        "width": "Optional image width.",
+                        "height": "Optional image height.",
+                        "loading": "Browser loading mode, e.g. lazy or eager.",
+                        "decoding": "Browser decoding mode, e.g. async.",
+                        "_children": "Do not use children with image."
+                    },
+                    "_core_rules": [
+                        "Use image for visual image content.",
+                        "Always provide alt text when possible.",
+                        "Use src for the image URL.",
+                        "Do not place _children inside image."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "image",
+                            "src": "/logo.png",
+                            "alt": "Logo"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "form",
+                    "_title": "XForm",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Semantic HTML form container for grouping input fields and submit actions.",
+                    "_fields": {
+                        "_children": "Form fields, labels, buttons, and layout children.",
+                        "action": "Optional native form action URL.",
+                        "method": "Optional native form method, usually get or post.",
+                        "name": "Optional form name.",
+                        "autocomplete": "Browser autocomplete behavior.",
+                        "novalidate": "Disable native browser validation."
+                    },
+                    "_core_rules": [
+                        "Use form when inputs belong to one submit action.",
+                        "Use field components inside form when available.",
+                        "Use button with type:'submit' for native submit behavior.",
+                        "Prefer _flow or _on.submit for app logic.",
+                        "Do not use form only as a visual container."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "form",
+                            "_id": "login-form",
+                            "_flow": {
+                                "_id": "login",
+                                "_payload": {
+                                    "username": "$xdata.login.username",
+                                    "password": "$xdata.login.password"
+                                }
+                            },
+                            "_flow_event": "submit",
+                            "_children": []
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "webcam",
+                    "_title": "XWebcam",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Webcam video object using browser mediaDevices.getUserMedia.",
+                    "_fields": {
+                        "autoplay": "Autoplay webcam video.",
+                        "muted": "Mute webcam video.",
+                        "_video_constraints": "getUserMedia video constraints."
+                    },
+                    "_core_rules": [
+                        "Use webcam only when live camera input is required.",
+                        "Requires browser camera permission.",
+                        "Do not use webcam for normal video playback; use video instead."
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "svg",
+                    "_title": "XSVG",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xuiobject"
+                    ],
+                    "_description": "Inline SVG container for vector graphics, icons, diagrams, and animated visual elements.",
+                    "_match": {
+                        "_keywords": [
+                            "svg",
+                            "icon",
+                            "vector",
+                            "diagram",
+                            "path",
+                            "shape",
+                            "logo"
+                        ],
+                        "_priority": 40
+                    },
+                    "_fields": {
+                        "_url": "External SVG URL to fetch and inline.",
+                        "src": "Alias for _url.",
+                        "_svg_data": "Raw SVG markup string to inject.",
+                        "viewBox": "SVG viewBox attribute.",
+                        "width": "SVG width.",
+                        "height": "SVG height.",
+                        "fill": "SVG fill attribute.",
+                        "stroke": "SVG stroke attribute.",
+                        "xmlns": "SVG namespace."
+                    },
+                    "_core_rules": [
+                        "Use svg for inline vector graphics, icons, and diagrams.",
+                        "Use image for normal raster/static images.",
+                        "Prefer XSVG shape objects for generated simple SVG graphics.",
+                        "Do not use svg as a generic layout container.",
+                        "Use _svg_data only with trusted SVG content."
+                    ],
+                    "_canonical_examples": [
+                        {
+                            "_type": "svg",
+                            "viewBox": "0 0 24 24",
+                            "width": 24,
+                            "height": 24,
+                            "_children": [
+                                {
+                                    "_type": "path",
+                                    "d": "M12 2L2 22h20L12 2z"
+                                }
+                            ]
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "circle",
+                    "_title": "XSVGCircle",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "svg-shape"
+                    ],
+                    "_description": "SVG circle shape.",
+                    "_fields": {
+                        "cx": "Circle center X.",
+                        "cy": "Circle center Y.",
+                        "r": "Circle radius.",
+                        "fill": "Fill color.",
+                        "stroke": "Stroke color."
+                    },
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "rect",
+                    "_title": "XSVGRect",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "svg-shape"
+                    ],
+                    "_description": "SVG rectangle shape.",
+                    "_fields": {
+                        "x": "Rectangle X position.",
+                        "y": "Rectangle Y position.",
+                        "width": "Rectangle width.",
+                        "height": "Rectangle height.",
+                        "rx": "Optional horizontal corner radius.",
+                        "ry": "Optional vertical corner radius.",
+                        "fill": "Fill color.",
+                        "stroke": "Stroke color."
+                    },
+                    "_canonical_examples": [
+                        {
+                            "_type": "rect",
+                            "x": 10,
+                            "y": 10,
+                            "width": 120,
+                            "height": 60,
+                            "rx": 8,
+                            "fill": "currentColor"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "ellipse",
+                    "_title": "XSVGEllipse",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "svg-shape"
+                    ],
+                    "_description": "SVG ellipse shape.",
+                    "_fields": {
+                        "cx": "Ellipse center X.",
+                        "cy": "Ellipse center Y.",
+                        "rx": "Horizontal radius.",
+                        "ry": "Vertical radius.",
+                        "fill": "Fill color.",
+                        "stroke": "Stroke color."
+                    },
+                    "_canonical_examples": [
+                        {
+                            "_type": "ellipse",
+                            "cx": 100,
+                            "cy": 60,
+                            "rx": 80,
+                            "ry": 40,
+                            "fill": "none",
+                            "stroke": "currentColor"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "line",
+                    "_title": "XSVGLine",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "svg-shape"
+                    ],
+                    "_description": "SVG line shape.",
+                    "_fields": {
+                        "x1": "Line start X.",
+                        "y1": "Line start Y.",
+                        "x2": "Line end X.",
+                        "y2": "Line end Y.",
+                        "stroke": "Line stroke color.",
+                        "stroke-width": "Line stroke width."
+                    },
+                    "_canonical_examples": [
+                        {
+                            "_type": "line",
+                            "x1": 0,
+                            "y1": 0,
+                            "x2": 100,
+                            "y2": 100,
+                            "stroke": "currentColor",
+                            "stroke-width": 2
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "polyline",
+                    "_title": "XSVGPolyline",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "svg-shape"
+                    ],
+                    "_description": "SVG polyline shape.",
+                    "_fields": {
+                        "points": "List of points for the polyline.",
+                        "fill": "Fill color.",
+                        "stroke": "Stroke color."
+                    },
+                    "_canonical_examples": [
+                        {
+                            "_type": "polyline",
+                            "points": "10,10 50,50 90,10",
+                            "fill": "none",
+                            "stroke": "currentColor"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "polygon",
+                    "_title": "XSVGPolygon",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "svg-shape"
+                    ],
+                    "_description": "SVG polygon shape.",
+                    "_fields": {
+                        "points": "List of points for the polygon.",
+                        "fill": "Fill color.",
+                        "stroke": "Stroke color."
+                    },
+                    "_canonical_examples": [
+                        {
+                            "_type": "polygon",
+                            "points": "10,10 50,50 90,10",
+                            "fill": "none",
+                            "stroke": "currentColor"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "path",
+                    "_title": "XSVGPath",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "svg-shape"
+                    ],
+                    "_description": "SVG path shape.",
+                    "_fields": {
+                        "d": "Path data.",
+                        "fill": "Fill color.",
+                        "stroke": "Stroke color."
+                    },
+                    "_canonical_examples": [
+                        {
+                            "_type": "path",
+                            "d": "M10,10 L90,90",
+                            "fill": "none",
+                            "stroke": "currentColor"
+                        }
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                },
+                {
+                    "_id": "xuiobject",
+                    "_title": "XUIObject Runtime UI Contract",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "view-skill",
+                    "_requires": [
+                        "xobject",
+                        "xem",
+                        "xdata"
+                    ],
+                    "_description": "Base UI runtime object for DOM creation, mounting, visibility, styling classes, semantic variants, UI events, and flow triggering.",
+                    "_fields": {
+                        "_html_tag": "DOM tag to create.",
+                        "_html_ns": "Optional DOM namespace.",
+                        "_html": "Generated HTML cache.",
+                        "_visible": "Current visibility state.",
+                        "_parent_element": "DOM parent element id.",
+                        "_text": "Text content/value.",
+                        "_on_show": "Handler when object is shown.",
+                        "_on_hide": "Handler when object is hidden.",
+                        "_on_show_animation": "Animation class used on show.",
+                        "_on_hide_animation": "Animation class used on hide.",
+                        "_flow": "Flow id or flow definition triggered by UI event.",
+                        "_flow_event": "DOM event that triggers _flow. Default click.",
+                        "_flow_auto": "Disable automatic flow binding when false.",
+                        "_variant": "Semantic visual variant.",
+                        "_tone": "Semantic color/tone.",
+                        "_size": "Semantic size.",
+                        "_density": "Semantic density.",
+                        "_elevation": "Semantic elevation.",
+                        "_dom_attrs": "Any non-underscore field is passed as a DOM attribute when supported, e.g. id, title, role, aria-label, data-*."
+                    },
+                    "_core_rules": [
+                        "Use XUIObject fields for UI behavior only.",
+                        "Use _children for UI composition.",
+                        "Use _variant, _tone, _size, _density, and _elevation instead of raw class/style.",
+                        "Use _on.click for local UI actions.",
+                        "Use _flow for app/business actions.",
+                        "Do not generate JavaScript functions in JSON."
+                    ],
+                    "_notes": [
+                        "XUIObject extends XObject.",
+                        "XUIObject binds DOM events from _on/_once.",
+                        "XUIObject can trigger flows through _flow and ui:flow-trigger."
+                    ],
+                    "_exports": {
+                        "_nano_commands": []
+                    }
+                }
+            ]
+        },
+        {
+            "_name": "xdb-client",
+            "_skills": [
+                {
+                    "_id": "xdb-client",
+                    "_title": "XDB Client Module",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "client-module-api",
+                    "_requires": [
+                        "xmodule"
+                    ],
+                    "_description": "Client-side key-value persistence bridge for XDBClient/local storage style operations.",
+                    "_core_rules": [
+                        "Use xdb-client for client-side persistence.",
+                        "Use XData/xd for reactive runtime state.",
+                        "Do not use xdb-client for server entity operations.",
+                        "Use string ops for simple values and object ops for JSON data."
+                    ],
+                    "_exports": {
+                        "_modules": [
+                            {
+                                "_name": "xdb-client",
+                                "_scope": "client",
+                                "_description": "Client-side key-value persistence bridge for XDBClient/local storage style operations.",
+                                "_ops": [
+                                    {
+                                        "_name": "info",
+                                        "_scope": "module",
+                                        "_description": "Return XDB client module info."
+                                    },
+                                    {
+                                        "_name": "has",
+                                        "_scope": "module",
+                                        "_description": "Check whether a key exists.",
+                                        "_params": {
+                                            "key": "Storage key."
+                                        }
+                                    },
+                                    {
+                                        "_name": "get-string",
+                                        "_scope": "module",
+                                        "_description": "Get a stored string value.",
+                                        "_params": {
+                                            "key": "Storage key."
+                                        }
+                                    },
+                                    {
+                                        "_name": "save-string",
+                                        "_scope": "module",
+                                        "_description": "Save a string value.",
+                                        "_params": {
+                                            "key": "Storage key.",
+                                            "value": "String value.",
+                                            "_debug": "Optional debug flag."
+                                        }
+                                    },
+                                    {
+                                        "_name": "get-object",
+                                        "_scope": "module",
+                                        "_description": "Get a stored JSON object.",
+                                        "_params": {
+                                            "key": "Storage key."
+                                        }
+                                    },
+                                    {
+                                        "_name": "save-object",
+                                        "_scope": "module",
+                                        "_description": "Save a JSON object.",
+                                        "_params": {
+                                            "key": "Storage key.",
+                                            "value": "Object value."
+                                        }
+                                    },
+                                    {
+                                        "_name": "remove",
+                                        "_scope": "module",
+                                        "_description": "Remove a stored key.",
+                                        "_params": {
+                                            "key": "Storage key."
+                                        }
+                                    },
+                                    {
+                                        "_name": "clear",
+                                        "_scope": "module",
+                                        "_description": "Clear all client XDB storage."
+                                    },
+                                    {
+                                        "_name": "keys",
+                                        "_scope": "module",
+                                        "_description": "Return all stored keys."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "_objects": []
+        },
+        {
+            "_name": "xvm",
+            "_skills": [
+                {
+                    "_id": "xvm",
+                    "_title": "XVM Client View Manager",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "client-module-api",
+                    "_requires": [
+                        "xmodule",
+                        "xui"
+                    ],
+                    "_description": "Client-side view manager for app manifests, containers, regions, routes, history, hash navigation, and view stacking.",
+                    "_core_rules": [
+                        "XVM controls application navigation and view lifecycle.",
+                        "Use XVM for routes, regions, containers, history, and app manifest loading.",
+                        "XUI creates and renders objects; XVM decides what view is active.",
+                        "Use navigate for route/hash navigation.",
+                        "Use show for stacking a view without changing URL hash.",
+                        "Use snake_case params."
+                    ],
+                    "_exports": {
+                        "_modules": [
+                            {
+                                "_name": "xvm",
+                                "_scope": "client",
+                                "_description": "Client-side view manager for app manifests, containers, regions, routes, history, hash navigation, and view stacking.",
+                                "_ops": [
+                                    {
+                                        "_name": "load-app",
+                                        "_scope": "module",
+                                        "_description": "Load an XVM app manifest.",
+                                        "_params": {
+                                            "_app": "XVMApp manifest.",
+                                            "_debug": "Optional debug flag."
+                                        }
+                                    },
+                                    {
+                                        "_name": "show",
+                                        "_scope": "module",
+                                        "_description": "Show a view or route in a region/container without changing URL hash.",
+                                        "_params": {
+                                            "_id": "View id or route id.",
+                                            "_region": "Optional region name.",
+                                            "_container_id": "Optional container id.",
+                                            "_allow_create_from_raw": "Allow creating a view from raw registry."
+                                        }
+                                    },
+                                    {
+                                        "_name": "navigate",
+                                        "_scope": "module",
+                                        "_description": "Navigate to a route or view and update hash if region policy allows.",
+                                        "_params": {
+                                            "_to": "Route id or view id.",
+                                            "_region": "Optional region name.",
+                                            "_replace": "Replace browser history hash.",
+                                            "_silent": "Do not update hash.",
+                                            "_container_id": "Optional container id.",
+                                            "_params": "Optional route/view params."
+                                        }
+                                    },
+                                    {
+                                        "_name": "back",
+                                        "_scope": "module",
+                                        "_description": "Navigate back in the region/container history stack.",
+                                        "_params": {
+                                            "_region": "Optional region name.",
+                                            "_container_id": "Optional container id.",
+                                            "_sync_hash": "Sync hash after going back.",
+                                            "_if_empty_close": "Close region if history is empty."
+                                        }
+                                    },
+                                    {
+                                        "_name": "close",
+                                        "_scope": "module",
+                                        "_description": "Close the active view in a region/container.",
+                                        "_params": {
+                                            "_region": "Optional region name. Default modal.",
+                                            "_container_id": "Optional container id.",
+                                            "_clear_history": "Clear region/container history."
+                                        }
+                                    },
+                                    {
+                                        "_name": "help",
+                                        "_scope": "module",
+                                        "_description": "Return XVM help or command-specific help.",
+                                        "_params": {
+                                            "_op": "Optional operation name."
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "_objects": []
+        },
+        {
+            "_name": "flow-client",
+            "_skills": [
+                {
+                    "_id": "flow-client",
+                    "_title": "Flow Manager Client",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "client-module-api",
+                    "_requires": [
+                        "xmodule",
+                        "xem",
+                        "xdata"
+                    ],
+                    "_description": "Client-side flow runtime bridge. Binds UI/runtime events to server flows, triggers flows through XUIRuntime, writes flow outputs into XData, and executes on_success/on_error commands.",
+                    "_core_rules": [
+                        "Use flow-client to trigger server-side flows from UI/runtime events.",
+                        "Use _flow on XUIObject for common UI-triggered flows.",
+                        "Flow outputs are written to XData by output key.",
+                        "Use _on_success and _on_error in flow definitions for post-flow commands.",
+                        "Do not run server business logic directly on the client."
+                    ],
+                    "_fields": {
+                        "_flow": "XUIObject field for flow id or flow definition.",
+                        "_flow_event": "DOM event that triggers _flow. Default click.",
+                        "_flow_auto": "Disable automatic flow binding when false.",
+                        "_flow._payload": "Payload object passed to the flow.",
+                        "$xdata.key": "Use XData references inside flow payloads."
+                    },
+                    "_exports": {
+                        "_modules": [
+                            {
+                                "_name": "flow-client",
+                                "_scope": "client",
+                                "_description": "Client-side flow runtime bridge. Binds UI/runtime events to server flows, triggers flows through XUIRuntime, writes flow outputs into XData, and executes on_success/on_error commands.",
+                                "_ops": [
+                                    {
+                                        "_name": "bind",
+                                        "_scope": "module",
+                                        "_description": "Bind a XEM/runtime event to a server flow execution.",
+                                        "_params": {
+                                            "_flow_id": "Flow id to execute.",
+                                            "_event": "XEM event name to listen for.",
+                                            "_app_id": "Current app id.",
+                                            "_env": "Optional environment. Defaults to default."
+                                        },
+                                        "_example": {
+                                            "_module": "flow-client",
+                                            "_op": "bind",
+                                            "_params": {
+                                                "_flow_id": "login",
+                                                "_event": "user:login-requested",
+                                                "_app_id": "my-app",
+                                                "_env": "default"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "_name": "trigger",
+                                        "_scope": "module",
+                                        "_description": "Trigger a server flow directly from the client.",
+                                        "_params": {
+                                            "_flow_id": "Flow id to execute.",
+                                            "_event_payload": "Optional payload object passed to the flow.",
+                                            "_event_name": "Optional source event name.",
+                                            "_app_id": "Optional app id. Defaults from XUIRuntime client.",
+                                            "_env": "Optional environment. Defaults from XUIRuntime client.",
+                                            "_source": "Trigger source: ui or event."
+                                        },
+                                        "_example": {
+                                            "_module": "flow-client",
+                                            "_op": "trigger",
+                                            "_params": {
+                                                "_flow_id": "login",
+                                                "_event_payload": {
+                                                    "username": "$xdata.login.username",
+                                                    "password": "$xdata.login.password"
+                                                },
+                                                "_source": "ui"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "_name": "help",
+                                        "_scope": "module",
+                                        "_description": "Return flow-client help."
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "_objects": []
+        },
+        {
+            "_name": "entity-client",
+            "_skills": [
+                {
+                    "_id": "entity-client",
+                    "_title": "Entity Client Runtime",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "client-module-api",
+                    "_requires": [
+                        "xmodule",
+                        "xdata"
+                    ],
+                    "_description": "Client-side runtime entity manager for synced CRUD operations and local entity cache access.",
+                    "_core_rules": [
+                        "Use entity-client for runtime CRUD operations.",
+                        "Entity records are synced through XDBSyncManager.",
+                        "Entity subscriptions are created automatically on first usage.",
+                        "Use _entity to select the target entity.",
+                        "Use _filter for querying and updates."
+                    ],
+                    "_fields": {
+                        "_entity": "Entity name.",
+                        "_filter": "Entity query filter.",
+                        "_updates": "Update payload object.",
+                        "data": "Record data for add operation.",
+                        "_env": "Optional environment.",
+                        "_app_id": "Optional application id."
+                    },
+                    "_exports": {
+                        "_modules": [
+                            {
+                                "_name": "entity-client",
+                                "_scope": "client",
+                                "_description": "Client-side runtime entity manager for synced CRUD operations and local entity cache access.",
+                                "_ops": [
+                                    {
+                                        "_name": "add",
+                                        "_scope": "module",
+                                        "_description": "Add a new entity record.",
+                                        "_params": {
+                                            "_entity": "Entity name.",
+                                            "data": "Record data object.",
+                                            "_env": "Optional environment.",
+                                            "_app_id": "Optional application id."
+                                        },
+                                        "_example": {
+                                            "_module": "entity-client",
+                                            "_op": "add",
+                                            "_params": {
+                                                "_entity": "users",
+                                                "data": {
+                                                    "username": "john"
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "_name": "find",
+                                        "_scope": "module",
+                                        "_description": "Find entity records using a filter.",
+                                        "_params": {
+                                            "_entity": "Entity name.",
+                                            "_filter": "Query filter object.",
+                                            "_env": "Optional environment.",
+                                            "_app_id": "Optional application id."
+                                        }
+                                    },
+                                    {
+                                        "_name": "update",
+                                        "_scope": "module",
+                                        "_description": "Update entity records using filter + update payload.",
+                                        "_params": {
+                                            "_entity": "Entity name.",
+                                            "_filter": "Query filter object.",
+                                            "_updates": "Update payload object.",
+                                            "_env": "Optional environment.",
+                                            "_app_id": "Optional application id."
+                                        }
+                                    },
+                                    {
+                                        "_name": "delete",
+                                        "_scope": "module",
+                                        "_description": "Delete entity records using a filter.",
+                                        "_params": {
+                                            "_entity": "Entity name.",
+                                            "_filter": "Query filter object.",
+                                            "_env": "Optional environment.",
+                                            "_app_id": "Optional application id."
+                                        }
+                                    },
+                                    {
+                                        "_name": "sync-entity",
+                                        "_scope": "module",
+                                        "_description": "Synchronize entity records from the server into the local runtime cache.",
+                                        "_params": {
+                                            "_entity": "Entity name.",
+                                            "_env": "Optional environment.",
+                                            "_app_id": "Optional application id."
+                                        }
+                                    },
+                                    {
+                                        "_name": "get-local",
+                                        "_scope": "module",
+                                        "_description": "Return locally cached entity records.",
+                                        "_params": {
+                                            "_entity": "Entity name."
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "_objects": []
+        },
+        {
+            "_name": "xd",
+            "_skills": [
+                {
+                    "_id": "xdata",
+                    "_title": "XData Runtime State Contract",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "xdata-skill",
+                    "_description": "Shared runtime state store used by Xpell modules and objects for reactive data binding.",
+                    "_requires": [
+                        "xmodule"
+                    ],
+                    "_core_rules": [
+                        "Use XData for shared runtime state.",
+                        "Use _data_source on objects to bind to an XData key.",
+                        "Use $xdata.key references in generated payloads when a flow or command needs current state.",
+                        "Do not use XData as hidden local component state.",
+                        "XData keys should be explicit and stable."
+                    ],
+                    "_fields": {
+                        "_data_source": "XData key used by XObject/XUIObject for reactive data binding.",
+                        "$xdata.key": "Runtime payload reference to an XData value."
+                    },
+                    "_exports": {
+                        "_modules": [
+                            {
+                                "_name": "xd",
+                                "_scope": "client",
+                                "_description": "Shared runtime state store used by Xpell modules and objects for reactive data binding.",
+                                "_ops": [
+                                    {
+                                        "_name": "get",
+                                        "_scope": "module",
+                                        "_description": "Get value from XData store.",
+                                        "_params": {
+                                            "key": "XData key."
+                                        }
+                                    },
+                                    {
+                                        "_name": "set",
+                                        "_scope": "module",
+                                        "_description": "Set value in XData store.",
+                                        "_params": {
+                                            "key": "XData key.",
+                                            "value": "Value to store.",
+                                            "source": "Optional mutation source."
+                                        }
+                                    },
+                                    {
+                                        "_name": "patch",
+                                        "_scope": "module",
+                                        "_description": "Patch plain object into existing XData value.",
+                                        "_params": {
+                                            "key": "XData key.",
+                                            "value": "Plain object patch.",
+                                            "source": "Optional mutation source."
+                                        }
+                                    },
+                                    {
+                                        "_name": "delete",
+                                        "_scope": "module",
+                                        "_description": "Delete XData key.",
+                                        "_params": {
+                                            "key": "XData key.",
+                                            "source": "Optional mutation source."
+                                        }
+                                    },
+                                    {
+                                        "_name": "touch",
+                                        "_scope": "module",
+                                        "_description": "Trigger XData subscribers without changing value.",
+                                        "_params": {
+                                            "key": "XData key.",
+                                            "source": "Optional mutation source."
+                                        }
+                                    },
+                                    {
+                                        "_name": "has",
+                                        "_scope": "module",
+                                        "_description": "Check if XData key exists.",
+                                        "_params": {
+                                            "key": "XData key."
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "_objects": []
+        },
+        {
+            "_name": "xem",
+            "_skills": [
+                {
+                    "_id": "xem",
+                    "_title": "XEventManager Runtime Event Bus",
+                    "_version": "1.0.0",
+                    "_active": true,
+                    "_type": "runtime-api-skill",
+                    "_description": "Global runtime event bus for decoupled communication between Xpell modules, objects, flows, and UI components.",
+                    "_requires": [
+                        "xmodule"
+                    ],
+                    "_core_rules": [
+                        "Use XEM for decoupled runtime events.",
+                        "Use explicit event names and explicit payload objects.",
+                        "Do not use XEM as state storage.",
+                        "Use XData for shared state and XEM for notifications/events.",
+                        "Prefer _on/_once on objects for local event handlers."
+                    ],
+                    "_fields": {
+                        "_on": "Object event handler map.",
+                        "_once": "Object one-time event handler map.",
+                        "event": "Event name to fire.",
+                        "data": "Optional event payload."
+                    },
+                    "_notes": [
+                        "XEM is process-wide and listener order should not be assumed.",
+                        "Event payloads should be JSON/data-only."
+                    ],
+                    "_exports": {
+                        "_modules": [
+                            {
+                                "_name": "xem",
+                                "_scope": "client",
+                                "_description": "Global runtime event bus for decoupled communication between Xpell modules, objects, flows, and UI components.",
+                                "_ops": [
+                                    {
+                                        "_name": "fire",
+                                        "_scope": "module",
+                                        "_description": "Fire a global XEM event with optional payload data.",
+                                        "_params": {
+                                            "event": "Event name.",
+                                            "data": "Optional event payload.",
+                                            "_debug": "Optional debug log flag."
+                                        },
+                                        "_example": {
+                                            "_module": "xem",
+                                            "_op": "fire",
+                                            "_params": {
+                                                "event": "user:login",
+                                                "data": {
+                                                    "source": "login-button"
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            ],
+            "_objects": []
+        }
+    ]
+}

@@ -80,6 +80,7 @@ Declared by `XUIObjectPack.getObjects()`:
   - `polyline` -> `XSVGPolyline`
   - `polygon` -> `XSVGPolygon`
   - `path` -> `XSVGPath`
+- Input-derived wrappers (`input`, `text`, `password`, `textarea`, `select`) support `_data_output` for writing the current value to XData on `input`/`change`.
 ## XUI module surface
 `XUI` is a singleton `XUIModule` with module name `xui`.
 Core methods:
@@ -101,6 +102,7 @@ Important data fields:
 - `_on_show`, `_on_hide`, `_on_show_animation`, `_on_hide_animation`
 - `_flow`, `_flow_event`, `_flow_auto`
 - Core inherited fields such as `_children`, `_data_source`, `_on`, `_once`, `_on_create`, `_on_mount`, `_on_frame`, `_on_data`, `_on_event`
+- Input-derived fields: `_data_output`, `_update_data_source_event`
 Deprecated/removed fields:
 - `_on_click` must not be used in new persisted view data.
 - Use `_on: { click: ... }` instead.

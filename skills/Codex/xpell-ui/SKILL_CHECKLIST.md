@@ -60,6 +60,10 @@ Use before finalizing generated UI code or reviewing changes that touch `@xpell/
 - [ ] Runtime/XEM events inside `_on` / `_once` use the `xem:` prefix.
 - [ ] DOM events inside `_on` / `_once` do not use prefixes.
 - [ ] XUIObject does not override XObject event semantics; runtime events go through inherited `addEventListener(...)`.
+- [ ] Input-derived controls use `_data_output` when the UI value should be written to XData.
+- [ ] `_data_output` and `_data_source` are not confused: `_data_output` writes to XData; `_data_source` reads/binds from XData.
+- [ ] `_update_data_source_event` is appropriate for the control: `input` for text/textarea/password, `change` for select.
+
 ## Transport and Runtime
 
 - [ ] Server-driven views use `XVMClient` or `XUIRuntime` and stay behind Wormholes/XVMClient boundaries.

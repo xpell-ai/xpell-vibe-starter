@@ -29,7 +29,7 @@ This skill depends on the contracts from `xpell-contract` and `xpell-core`.
 4. Use `_on` / `_once` with Nano-Commands v2 text or JSON for persisted event handlers.
 5. Do not use `_on_click`; use `_on: { click: ... }`.
 6. Use `_flow`, `_flow_event`, and `_flow_auto` only as declarative UI-to-flow triggers.
-7. Use `_xd`, `_data_source`, and `_on_data` for shared runtime data binding.
+7. Use `_xd`, `_data_source`, `_data_output`, and `_on_data` for shared runtime data binding. `_data_output` writes input-derived values to XData on the configured update event.
 8. Use Wormholes/XVMClient/XUIRuntime for server-driven views; keep server commands behind the transport boundary.
 9. Keep browser local persistence infrastructure-scoped. `XDB` is allowed for runtime cache/local browser storage, not as a hidden app domain database.
 ## XUI Rules
@@ -63,6 +63,9 @@ This skill depends on the contracts from `xpell-contract` and `xpell-core`.
 - `XUIRuntime.loadModules(...)` loads `XUI`, optionally `XVM` and a flow client, then optionally starts `_x`.
 - `XUIRuntime.loadApp(...)` builds an `XVMClient`, bootstraps it, stores the client, and returns it.
 ## Events, Data, and Flows
+- `XInput` and input-derived controls (`text`, `password`, `textarea`, `select`) support `_data_output` to write the current value into XData.
+- `_update_data_source_event` controls when `_data_output` is written. Use `input` for text-like controls and `change` for select-like controls.
+- Do not confuse `_data_output` with `_data_source`: `_data_output` writes to XData; `_data_source` is for reading/binding from XData.
 - `_xem` is the UI event manager singleton exported by `@xpell/ui`.
 - DOM event handlers in `_on` / `_once` maps are bound during `XUIObject.onMount()`.
 - `_on` supports both DOM events and runtime XEM events.

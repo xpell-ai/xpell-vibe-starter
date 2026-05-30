@@ -1,63 +1,153 @@
 {
   "_id": "main",
   "_type": "view",
-  "style": "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#111;color:white;",
+  "_theme": "dark",
   "_children": [
     {
-      "_type": "view",
-      "style": "width:600px;display:flex;flex-direction:column;gap:20px;padding:40px;",
+      "_type": "style-sheet",
+      "_classes": {
+        "system-home": {
+          "padding": "40px",
+          "display": "flex",
+          "flex-direction": "column",
+          "gap": "28px",
+          "min-height": "100vh",
+          "box-sizing": "border-box",
+          "background": "radial-gradient(circle at top, #172033 0%, #0f172a 45%, #0b1020 100%)"
+        },
+        "hero-card": {
+          "max-width": "760px",
+          "margin": "0 auto",
+          "padding": "32px",
+          "border-radius": "28px",
+          "background": "rgba(15,23,42,0.82)",
+          "backdrop-filter": "blur(16px)",
+          "border": "1px solid rgba(255,255,255,0.06)",
+          "box-shadow": "0 20px 60px rgba(0,0,0,0.45)"
+        },
+        "hero-card .xfield": {
+          "width": "100%"
+        },
+        "hero-card .xfield__control": {
+          "width": "100%"
+        },
+        "hero-card input": {
+          "width": "100%",
+          "box-sizing": "border-box"
+        },
+        "hero-card textarea": {
+          "width": "100%",
+          "box-sizing": "border-box",
+          "resize": "vertical"
+        },
+        "hero-stack": {
+          "width": "100%"
+        },
+        "hero-title": {
+          "font-size": "48px",
+          "font-weight": "700",
+          "line-height": "1.1",
+          "margin-bottom": "10px"
+        },
+        "hero-subtitle": {
+          "font-size": "18px",
+          "line-height": "1.6",
+          "opacity": "0.72",
+          "margin-bottom": "12px"
+        },
+        "hero-actions": {
+          "margin-top": "12px"
+        },
+        "dashboard-grid": {
+          "margin-top": "8px"
+        },
+        "dashboard-card": {
+          "min-height": "220px"
+        },
+        "tip-label": {
+          "opacity": "0.84",
+          "line-height": "1.5"
+        },
+        "runtime-badge-stack": {
+          "padding-top": "8px"
+        }
+      }
+    },
+    {
+      "_type": "stack",
+      "class": "system-home",
+      "_gap": 28,
       "_children": [
         {
-          "_type": "label",
-          "_text": "What do you want to build?"
-        },
-        {
-          "_type": "text",
-          "_id": "app-id",
-          "rows": 5,
-          "style": "width:100%;background:#222;color:white;padding:10px;border:1px solid #333;",
-          "placeholder": "App id: e.g. todo-app, game, etc.",
-          "_text":"my-app",
-          "_on": {
-            "change": {
-              "_module": "xd",
-              "_op": "set",
-              "_params": {
-                "key": "vibe.app_id",
-                "value": "$event.target.value",
-                "_debug": true
-              }
+          "_type": "xsection",
+          "class": "hero-card",
+          "_children": [
+            {
+              "_type": "stack",
+              "class": "hero-stack",
+              "_gap": 22,
+              "_children": [
+                {
+                  "_type": "label",
+                  "_text": "Build live apps with Xpell.AI",
+                  "class": "hero-title"
+                },
+                {
+                  "_type": "label",
+                  "_text": "Describe what you want to build and generate a live application in real-time.",
+                  "class": "hero-subtitle"
+                },
+                {
+                  "_type": "field",
+                  "_label": "App ID",
+                  "_control": {
+                    "_type": "text",
+                    "_id": "app-id",
+                    "placeholder": "todo-app, ai-dashboard, game...",
+                    "_text": "my-app",
+                    "_data_output": "vibe.app_id",
+                    "_update_data_source_event": "input"
+                  }
+                },
+                {
+                  "_type": "field",
+                  "_label": "What do you want to build?",
+                  "_control": {
+                    "_type": "textarea",
+                    "_id": "prompt-input",
+                    "rows": 6,
+                    "placeholder": "E.g. A collaborative todo app with auth, realtime updates and analytics dashboard...",
+                    "_data_output": "vibe.prompt"
+                  }
+                },
+                {
+                  "_type": "toolbar",
+                  "class": "hero-actions",
+                  "_justify": "start",
+                  "_gap": 14,
+                  "_children": [
+                    {
+                      "_type": "button",
+                      "_text": "Generate App",
+                      "_variant": "primary",
+                      "_flow": {
+                        "_id": "flow-generate-app",
+                        "_payload": {
+                          "_prompt": "$xdata.vibe.prompt",
+                          "_app_id": "$xdata.vibe.app_id"
+                        }
+                      }
+                    },
+                    {
+                      "_type": "button",
+                      "_text": "Open Studio",
+                      "_variant": "secondary"
+                    }
+                  ]
+                }
+              ]
             }
-          }
-        },
-        {
-          "_type": "textarea",
-          "_id": "prompt-input",
-          "rows": 5,
-          "style": "width:100%;background:#222;color:white;padding:10px;border:1px solid #333;",
-          "placeholder": "E.g. A todo app with React, a game with Phaser, etc.",
-          "_on": {
-            "change": {
-              "_module": "xd",
-              "_op": "set",
-              "_params": {
-                "key": "vibe.prompt",
-                "value": "$event.target.value",
-                "_debug": true
-              }
-            }
-          }
-        },
-        {
-          "_type": "button",
-          "_text": "Generate App",
-          "_flow": {
-            "_id": "flow-generate-app",
-            "_payload": {
-              "_prompt": "$xdata.vibe.prompt",
-              "_app_id": "$xdata.vibe.app_id"
-            }
-          }
+          ]
         }
       ]
     }

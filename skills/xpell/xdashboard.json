@@ -1,0 +1,72 @@
+{
+  "_id": "xdashboard",
+  "_title": "XDashboard Component Pack Rules",
+  "_version": "1.1.0",
+  "_active": true,
+  "_type": "view-skill",
+  "_description": "Styled dashboard/layout XUI components for semantic Vibe AI app generation.",
+  "_applies_to": [
+    "@xpell/ui",
+    "xdashboard",
+    "xui",
+    "view-generation",
+    "xvibe"
+  ],
+  "_requires": [
+    "xpell-contract",
+    "xpell-core",
+    "xui-core"
+  ],
+  "_match": {
+    "_keywords": [
+      "dashboard",
+      "xdashboard",
+      "card",
+      "grid",
+      "stack",
+      "field",
+      "toolbar",
+      "badge",
+      "kpi",
+      "drawer",
+      "sidebar",
+      "xsection",
+      "form",
+      "layout",
+      "app screen"
+    ],
+    "_artifact_types": [
+      "view"
+    ],
+    "_packages": [
+      "@xpell/xdashboard",
+      "@xpell/ui"
+    ]
+  },
+  "_core_rules": [
+    "Return ONLY valid JSON.",
+    "Use XDashboard components for styled application layouts when available.",
+    "Use real XDashboard _type names: card, grid, navlist, badge, table, modal, toast, divider, stack, kpi-card, scroll, spacer, toolbar, empty, igroup, search, select, field, drawer, sidebar, xsection.",
+    "Use xsection for dashboard sections because XUI core reserves section as an HTML tag.",
+    "Prefer semantic fields: _variant, _tone, _size, _density, _elevation.",
+    "Do NOT use raw style or class unless explicitly requested.",
+    "Generated apps may include _theme as \"light\", \"dark\", or a token object.",
+    "Do NOT generate CSS frameworks, Tailwind, Bootstrap, React, Vue, or HTML documents.",
+    "Use _children arrays for nested content."
+  ],
+  "_priority_rules": [
+    "For modern app screens, use _type:\"stack\" or _type:\"xsection\" inside root _type:\"view\".",
+    "For styled apps, prefer dashboard components: xsection > stack > card > field.",
+    "For forms, wrap inputs in card and use field when possible.",
+    "For dashboard stats, use kpi-card.",
+    "Use primitive xui-core controls like label, text, textarea, and button inside dashboard containers."
+  ],
+  "_anti_patterns": [
+    "Using raw div/style layout when stack/card/xsection can express it.",
+    "Using xsection instead of section for dashboard sections.",
+    "Using xselect instead of selectfor dashboard dropdowns.",
+    "Using x-card, x-stack, x-grid, or x-kpi-card as _type names.",
+    "Returning CSS blocks.",
+    "Returning HTML documents."
+  ]
+}

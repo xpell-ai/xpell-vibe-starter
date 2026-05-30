@@ -3,7 +3,7 @@ import { MockProvider } from "@xpell/xai-providers/mock";
 import { AzureProvider } from "@xpell/xai-providers/azure";
 import "dotenv/config";
 // import { VibeAIEngineModule } from "./modules/vibe-ai/VibeAIEngineModule.js";
-import { VibeModule } from "./modules/vibe/VibeModule.js";
+import { XStudioModule } from "./modules/vibe/XStudioModule.js";
 import { XTestModule } from "./modules/Test/XTest.js";
 
 
@@ -60,7 +60,7 @@ async function main() {
     _x._verbose = true;
     _xlog._debug = true;
     const node = new XNode();
-    
+
     await node.start({
       _work_folder: "./work",
       _system_xapps_path: "./system-xapps",
@@ -73,8 +73,8 @@ async function main() {
         _type: "fs"
       },
     });
-    
-    await _x.loadModuleAsync(new VibeModule());
+
+    await _x.loadModuleAsync(new XStudioModule());
     await _x.loadModuleAsync(new XTestModule());
     // await bootstrap_default_app();
     _xai.registerProvider(
@@ -93,6 +93,46 @@ async function main() {
     });
 
     _xlog.log("[vibe-server] ready");
+
+    // const create_result =
+    //   await _x.execute({
+    //     _module: "module-creator",
+    //     _op: "create-module-spec",
+    //     _params: {
+    //       _spec: {
+    //         _id: "test-module",
+    //         _name: "test-module",
+    //         _target: "server",
+    //         _imports: [{ _from: "@xpell/node" }],
+    //         _ops: [
+    //           {
+    //             _name: "ping",
+    //             _description: "Test operation",
+    //             _params: { _message: "Optional message." }
+    //           }
+    //         ]
+    //       }
+    //     }
+    //   });
+
+    // _xlog.log(
+    //   "[module-creator] create test",
+    //   create_result
+    // );
+
+    // _xlog.log("[module-creator] load test module",
+    //   await _x.execute({
+    //   _module: "module-creator",
+    //   _op: "load-generated-module",
+    //   _params: { _id: "test-module" }
+    // }));
+
+    // _xlog.log("[test-module] ping test",
+    //   await _x.execute({
+    //     _module: "test-module",
+    //     _op: "ping",
+    //     _params: {}
+    //   }));
 
   } catch (err) {
     _xlog.error("[vibe-server] fatal", err);
