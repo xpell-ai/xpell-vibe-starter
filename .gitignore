@@ -116,3 +116,4 @@ package-lock.json
 
 #work (.work/)
 work/
+server-log.txt

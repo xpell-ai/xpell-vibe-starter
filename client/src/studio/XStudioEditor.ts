@@ -23,6 +23,9 @@ export class XStudioEditor {
   }
 
 
+  get mounted(): boolean {
+    return this._mounted;
+  }
 
   mount(): void {
     const shell = XUI.getObject("xvibe-shell") as any;

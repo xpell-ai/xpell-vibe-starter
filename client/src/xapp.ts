@@ -49,7 +49,7 @@ function resolveRuntimeMode(
 }
 
 async function syncClientSkills(client: any, mode: XRuntimeMode) {
-  if (mode !== "build" && mode !== "system") return;
+  // if (mode !== "build" && mode !== "system") return;
 
   const skills = _x.getSkills();
 
@@ -159,31 +159,31 @@ function registerStudioListeners(client: any) {
 
   _xlog.log("[vibe-client] registering studio listeners");
 
-  _xem.on(
-    "studio:preview-request",
-    async () => {
-      try {
-        await requestStudioPreview(client);
-      } catch (err) {
-        _xlog.error("[vibe-client] studio preview failed:", err);
-        _xem.fire("studio:error", err);
-      }
-    },
-    { _owner: "studio-client" }
-  );
+  // _xem.on(
+  //   "studio:preview-request",
+  //   async () => {
+  //     try {
+  //       await requestStudioPreview(client);
+  //     } catch (err) {
+  //       _xlog.error("[vibe-client] studio preview failed:", err);
+  //       _xem.fire("studio:error", err);
+  //     }
+  //   },
+  //   { _owner: "studio-client" }
+  // );
 
-  _xem.on(
-    "studio:apply-request",
-    async () => {
-      try {
-        await requestStudioApply(client);
-      } catch (err) {
-        _xlog.error("[vibe-client] studio apply failed:", err);
-        _xem.fire("studio:error", err);
-      }
-    },
-    { _owner: "studio-client" }
-  );
+  // _xem.on(
+  //   "studio:apply-request",
+  //   async () => {
+  //     try {
+  //       await requestStudioApply(client);
+  //     } catch (err) {
+  //       _xlog.error("[vibe-client] studio apply failed:", err);
+  //       _xem.fire("studio:error", err);
+  //     }
+  //   },
+  //   { _owner: "studio-client" }
+  // );
 
   _xem.on(
     "studio:close",
@@ -308,11 +308,11 @@ const main = async () => {
 
         editor.toggle();
 
-        // if (editor.visible) {
-        //   void syncClientSkills(client, "build").catch((err) => {
-        //     _xlog.error("[vibe-client] sync client skills failed", err);
-        //   });
-        // }
+        if (editor.mounted) {
+          void syncClientSkills(client, "build").catch((err) => {
+            _xlog.error("[vibe-client] sync client skills failed", err);
+          });
+        }
       }
     });
 

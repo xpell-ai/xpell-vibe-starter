@@ -197,6 +197,7 @@ V2 events:
 V2 methods:
 - `open(opts)`, `close()`, `onOpen(cb)`
 - `sendXcmd(xcmd, timeoutMs?)`
+- `sendXcmdFireAndListen(xcmd)`
 - `sendSync(payload, timeoutMs?)`
 - `sendEvt(name, data?, args?)`
 V2 protocol notes:
@@ -204,6 +205,7 @@ V2 protocol notes:
 - `REQ`/`RES` correlation uses `RES._rid === REQ._id`.
 - `HELLO`, `AUTH`, `REQ`, `RES`, `EVT`, `PING`, and `PONG` are envelope kinds.
 - `sendXcmd` wraps commands with `makeReq(...)`.
+- `sendXcmdFireAndListen` sends a `REQ` without registering a response waiter; callers must rely on server events for completion/failure.
 ## XDB behavior
 `XDB` is browser-local storage infrastructure, exported as `XDB` and `_xdb`.
 Core methods:
@@ -274,4 +276,3 @@ repository checks
 * Package build: run pnpm build from packages/xpell-ui.
 * Type build: run pnpm run build:types from packages/xpell-ui.
 * XData guard: run pnpm run check:xdata-legacy from packages/xpell-ui.
-
