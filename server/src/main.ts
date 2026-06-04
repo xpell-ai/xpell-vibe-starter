@@ -93,46 +93,8 @@ async function main() {
     });
 
     _xlog.log("[vibe-server] ready");
-
-    // const create_result =
-    //   await _x.execute({
-    //     _module: "module-creator",
-    //     _op: "create-module-spec",
-    //     _params: {
-    //       _spec: {
-    //         _id: "test-module",
-    //         _name: "test-module",
-    //         _target: "server",
-    //         _imports: [{ _from: "@xpell/node" }],
-    //         _ops: [
-    //           {
-    //             _name: "ping",
-    //             _description: "Test operation",
-    //             _params: { _message: "Optional message." }
-    //           }
-    //         ]
-    //       }
-    //     }
-    //   });
-
-    // _xlog.log(
-    //   "[module-creator] create test",
-    //   create_result
-    // );
-
-    // _xlog.log("[module-creator] load test module",
-    //   await _x.execute({
-    //   _module: "module-creator",
-    //   _op: "load-generated-module",
-    //   _params: { _id: "test-module" }
-    // }));
-
-    // _xlog.log("[test-module] ping test",
-    //   await _x.execute({
-    //     _module: "test-module",
-    //     _op: "ping",
-    //     _params: {}
-    //   }));
+    
+    
 
   } catch (err) {
     _xlog.error("[vibe-server] fatal", err);
