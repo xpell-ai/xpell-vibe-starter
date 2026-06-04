@@ -9,14 +9,14 @@
     "dev": "tsc -p . && node dist/main.js"
   },
   "dependencies": {
-    "@xpell/node": "workspace:*",
-    "@xpell/xai-providers": "workspace:*",
+    "@xpell/node": "^2.0.2",
+    "@xpell/xai-providers": "^2.0.2",
     "dotenv": "^17.4.2"
   },
   "devDependencies": {
     "typescript": "^5.9.3"
   },
   "peerDependencies": {
-    "@xpell/core": "^2.0.0"
+    "@xpell/core": "^2.0.2"
   }
 }
