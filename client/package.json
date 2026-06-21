@@ -10,11 +10,11 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@xpell/ui": "^2.0.2",
-    "@xpell/xdashboard": "^2.0.2"
+    "@xpell/ui": "workspace:*",
+    "@xpell/xdashboard": "workspace:*"
   },
   "peerDependencies": {
-    "@xpell/core": "^2.0.2"
+    "@xpell/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

@@ -12,7 +12,8 @@ import { XStudioEditor } from "./studio/XStudioEditor";
 import { XDashboardPack } from "@xpell/xdashboard";
 
 import "@xpell/ui/xui.css";
-import "@xpell/xdashboard/xdashboard.css";
+import "@xpell/xdashboard/xdashboard.css"
+import "./style/xvibe-app.css";
 
 type XRuntimeMode = "runtime" | "build" | "system";
 
@@ -210,9 +211,6 @@ function registerStudioListeners(client: any) {
           _env: env
         });
 
-        XDB.setString?.("xvibe.active_app", app_id);
-        XDB.set?.("xvibe.active_app", app_id);
-
         window.location.reload();
       } catch (err) {
         _xlog.error("[vibe-client] open generated app failed", err);
@@ -292,15 +290,15 @@ const main = async () => {
 
     registerStudioListeners(client);
 
-    if (mode === "build" || mode === "system") {
-      try {
-        await syncClientSkills(client, mode);
-      } catch (err) {
-        _xlog.error("[vibe-client] sync client skills failed", err);
-      }
+    // if (mode === "build" || mode === "system") {
+    //   try {
+    //     await syncClientSkills(client, mode);
+    //   } catch (err) {
+    //     _xlog.error("[vibe-client] sync client skills failed", err);
+    //   }
 
-      editor.mount();
-    }
+    //   editor.mount();
+    // }
 
     window.addEventListener("keydown", (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "e") {

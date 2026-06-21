@@ -48,6 +48,30 @@ requires:
   - XAI helpers: `XAIModule`, `XAI`, `_xai`, `XAIRegistry`, and XAI provider types.
   - XDB API: `XDB`, `XDBStorageFS`, `XDBStorageSqlite`, `XDBEngine`, entity/file/vector/temp/cache types.
   - Wormholes API via `export * from "./Wormholes/wh.index.js"`.
+## Runtime Capability Contract
+
+Every server runtime module SHOULD expose:
+
+- `static _name`
+- `static _ops`
+- `static _skill`
+
+`_ops` must describe public command operations.
+
+`_skill` must export the module through:
+
+```ts
+_exports: {
+  _modules: [
+    {
+      _name: "...",
+      _scope: "server",
+      _description: "...",
+      _ops: Object.values(MODULE_OPS)
+    }
+  ]
+}```
+
 
 ## 4) XDB contract
 - `XDB` is a singleton `XDBModule` (`_name: "xdb"`).

@@ -1,0 +1,167 @@
+{
+  "_id": "main",
+  "_type": "view",
+  "_theme": "terminal",
+  "_children": [
+    {
+      "_type": "style-sheet",
+      "_href": "http://localhost:3000/public/custom.css",
+      "_classes": {}
+    },
+    {
+      "_type": "stack",
+      "class": "page-shell",
+      "_gap": 0,
+      "_children": [
+        {
+          "_type": "view",
+          "class": "page-toolbar",
+          "_children": [
+            {
+              "_type": "stack",
+              "class": "page-toolbar__left",
+              "_children": [
+                {
+                  "_type": "label",
+                  "_text": "Dashboard",
+                  "class": "page-title"
+                },
+                {
+                  "_type": "label",
+                  "_text": "Live operational overview powered by Xpell.",
+                  "class": "page-subtitle"
+                }
+              ]
+            },
+            {
+              "_type": "stack",
+              "class": "page-toolbar__right",
+              "_children": [
+                {
+                  "_type": "button",
+                  "_text": "Refresh"
+                },
+                {
+                  "_type": "button",
+                  "_text": "+ New Record"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "_type": "grid",
+          "class": "card-grid",
+          "_children": [
+            {
+              "_type": "kpi-card",
+              "_label": "Active Users",
+              "_value": "128",
+              "_delta": "+12%",
+              "_trend": "up",
+              "_icon": "👥",
+              "_variant": "accent"
+            },
+            {
+              "_type": "kpi-card",
+              "_label": "Revenue",
+              "_value": "$24.8K",
+              "_delta": "+8%",
+              "_trend": "up",
+              "_icon": "💰",
+              "_variant": "success"
+            },
+            {
+              "_type": "kpi-card",
+              "_label": "Open Tasks",
+              "_value": "34",
+              "_delta": "-3",
+              "_trend": "down",
+              "_icon": "✅",
+              "_variant": "warning"
+            },
+            {
+              "_type": "kpi-card",
+              "_label": "System Health",
+              "_value": "99.9%",
+              "_delta": "Stable",
+              "_trend": "flat",
+              "_icon": "🟢",
+              "_variant": "accent"
+            }
+          ]
+        },
+        {
+          "_type": "grid",
+          "class": "page-layout-2 page-section",
+          "_children": [
+            {
+              "_type": "stack",
+              "class": "panel",
+              "_children": [
+                {
+                  "_type": "label",
+                  "_text": "Recent Activity",
+                  "class": "panel-title"
+                },
+                {
+                  "_type": "label",
+                  "_text": "Latest runtime events and operational updates.",
+                  "class": "panel-subtitle"
+                },
+                {
+                  "_type": "table",
+                  "_columns": [
+                    { "_key": "event", "_title": "Event" },
+                    { "_key": "owner", "_title": "Owner" },
+                    { "_key": "status", "_title": "Status" }
+                  ],
+                  "_data": [
+                    { "event": "Dashboard created", "owner": "System", "status": "Done" },
+                    { "event": "AI provider connected", "owner": "Aime", "status": "Active" },
+                    { "event": "View synced", "owner": "XVM", "status": "Ready" }
+                  ],
+                  "_striped": true,
+                  "_hover": true,
+                  "_bordered": true
+                }
+              ]
+            },
+            {
+              "_type": "stack",
+              "class": "panel",
+              "_children": [
+                {
+                  "_type": "label",
+                  "_text": "Control Panel",
+                  "class": "panel-title"
+                },
+                {
+                  "_type": "label",
+                  "_text": "Quick actions for this dashboard.",
+                  "class": "panel-subtitle"
+                },
+                {
+                  "_type": "card",
+                  "_hide_image": true,
+                  "_title": "Runtime Ready",
+                  "_text": "This app is ready for live mutation with Xpell Vibe Studio.",
+                  "_actions": [
+                    {
+                      "_type": "button",
+                      "_text": "Open Studio"
+                    },
+                    {
+                      "_type": "button",
+                      "_text": "View Logs"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

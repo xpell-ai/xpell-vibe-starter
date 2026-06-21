@@ -330,9 +330,11 @@ Runtime utilities.
 Responsibilities:
 
 - utility helpers
+- AI/runtime primitive helpers
 - logging facade
 - parameter extraction
 - shared constants
+- reducing duplicated generated helper code
 
 Important symbols:
 
@@ -343,6 +345,83 @@ Important symbols:
 - `_xlog`
 - `_XLogger`
 - `XParams`
+
+Package root exports:
+
+- `XUtils`
+- `_xu`
+- `_XUtils`
+
+Preferred generated-code import:
+
+```ts
+import { _xu } from "@xpell/core";
+```
+
+`_xu` is the preferred singleton for generated code. Use it for existing runtime-safe helpers instead of recreating local utility functions.
+
+`_XUtils` serves as the AI Primitive Layer for Xpell-generated code.
+
+AI / runtime primitive helper groups:
+
+Object / type helpers:
+
+- `is_plain_object(value)`
+- `is_non_empty_string(value)`
+- `has_value(value)`
+- `to_record(value)`
+- `ensure_params(raw)`
+- `ensure_object(value, "field_name")`
+
+String validation:
+
+- `ensure_string(value, "field_name")`
+- `read_optional_string(value, "field_name")`
+- `ensure_number(value, "field_name")`
+- `read_optional_number(value, "field_name")`
+- `ensure_boolean(value, "field_name")`
+- `read_optional_boolean(value, "field_name")`
+
+Prompt helpers:
+
+- `normalize_prompt(prompt)` for preserving casing while normalizing spacing/unicode
+- `normalize_prompt_key(prompt)` only for matching/search keys where lowercase normalization is safe
+
+Array helpers:
+
+- `ensure_array(value)`
+- `compact_array(value, max_items)`
+- `unique_strings(values)`
+- `unique_normalized_ids(ids)`
+- `normalize_id_array(value)`
+- `ensure_object_array(value)`
+
+JSON helpers:
+
+- `safe_json_parse(value, fallback)`
+- `safe_json_stringify(value, fallback)`
+- `clone_json(value)`
+- `compact_json(value, max_chars)`
+- `compact_inline_json(value, max_chars)`
+- `safe_compact_inline_json(value, max_chars)`
+
+Path helpers:
+
+- `get_path(obj, "a.b.c", fallback)`
+- `set_path(obj, "a.b.c", value)`
+
+Keyword helpers:
+
+- `escape_regexp(value)`
+- `matches_keyword(prompt, keyword)`
+- `match_keywords(prompt, keywords)`
+- `contains_keyword(prompt, keywords)`
+
+Identifier helpers:
+
+- `normalize_id(value)`
+- `unique_normalized_ids(ids)`
+- `normalize_id_array(value)`
 
 ## 4. Hot classes and singletons
 
@@ -429,4 +508,3 @@ Layer notes:
 	•	DOM/browser event adaptation belongs in @xpell/ui, not @xpell/core.
 	•	Node/transport/filesystem behavior belongs in @xpell/node, not @xpell/core.
 	•	3D/spatial behavior belongs in @xpell/3d, not @xpell/core.
-

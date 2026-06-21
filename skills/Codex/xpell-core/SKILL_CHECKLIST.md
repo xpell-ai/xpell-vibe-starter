@@ -196,7 +196,14 @@ Rules:
 	•	Data delivery is subscription-based, not frame polling.
 	•	dispose() must unbind data listeners and event listeners.
 
-11) Hard forbiddens
+11) XUtils / _xu review checks
+
+- [ ] Generated code does not recreate helpers that already exist on `_xu`.
+- [ ] New helper functions were evaluated for inclusion in `_XUtils` before being implemented locally.
+- [ ] Core utility additions are platform-neutral and do not depend on DOM, FS, process, or app/domain behavior.
+- [ ] Domain-specific helpers were kept in the relevant module instead of `_XUtils`.
+
+12) Hard forbiddens
 	•	Do not add UI behavior to @xpell/core.
 	•	Do not use XData as an event bus.
 	•	Do not use events as state.
@@ -208,9 +215,8 @@ Rules:
 	•	Do not create hidden cross-module mutation paths.
 	•	Do not couple core to Node FS or browser DOM APIs.
 
-12) Related files
+13) Related files
 
 Use these files for details:
 	•	SKILL_API_MAP.md — public API, exports, command shapes, examples
 	•	SKILL_CHECKLIST.md — review checklist before merge
-

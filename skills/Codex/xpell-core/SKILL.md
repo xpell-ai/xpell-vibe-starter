@@ -51,6 +51,64 @@ Code reality caveat:
 
 - `XParser.xmlString2Xpell()` uses `DOMParser`; this helper requires an environment that provides `DOMParser`.
 
+## XUtils / _xu Contract
+
+`_xu` is the canonical utility singleton exported from `@xpell/core`.
+
+`_XUtils` serves as the AI Primitive Layer for Xpell-generated code.
+
+Generated or reviewed Xpell code should import and use `_xu` for common runtime-safe helper behavior:
+
+```ts
+import { _xu } from "@xpell/core";
+```
+
+Rules:
+
+- Before creating a utility/helper function, check whether an equivalent `_xu` helper already exists.
+- Use `_xu` when an equivalent helper already exists.
+- Do not generate local helper functions for behavior already covered by `_xu`.
+- Prefer extending `_XUtils` over creating duplicated helpers when the behavior is platform-neutral, reusable, and not domain-specific.
+- `_xu` helpers must remain platform-neutral.
+- Node/filesystem helpers belong in `@xpell/node`, not `@xpell/core`.
+- Domain-specific helpers belong in their owning module, not `_xu`.
+- `_xu` is not runtime state, a module, an event bus, persistence, or a lifecycle owner.
+
+Common `_xu` helper groups:
+
+- Object/type helpers: `is_plain_object`, `is_non_empty_string`, `has_value`, `to_record`, `ensure_params`
+- Validation helpers: `ensure_string`, `read_optional_string`,"ensure_number", `read_optional_number`, `ensure_boolean`, `read_optional_boolean`, `ensure_object`, `read_optional_object`
+- Prompt helpers: `normalize_prompt`, `normalize_prompt_key`
+- JSON helpers: `safe_json_parse`, `safe_json_stringify`, `clone_json`, `compact_json`, `compact_inline_json`, `safe_compact_inline_json`
+- Array helpers: `ensure_array`, `compact_array`, `unique_strings`, `unique_normalized_ids`, `normalize_id_array`, `ensure_object_array`
+- Path helpers: `get_path`, `set_path`
+- Keyword helpers: `escape_regexp`, `matches_keyword`, `match_keywords`, `contains_keyword`
+- Identifier helpers: `normalize_id`, `normalize_id_array`, `unique_normalized_ids`
+
+Good:
+
+```ts
+const params = _xu.ensure_params(raw);
+const name = _xu.ensure_string(params._name, "_name");
+const tags = _xu.normalize_id_array(params._tags);
+const objects = _xu.ensure_object_array(raw_items);
+const compact = _xu.safe_compact_inline_json(runtime_context, 4000);
+```
+
+Bad:
+
+```ts
+function is_plain_object(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+```
+
+Replace with:
+
+```ts
+_xu.is_plain_object(value);
+```
+
 ## 3. Runtime Accessor Contract
 
 Core primitives such as `XObject` must not import the engine singleton directly.
@@ -376,4 +434,3 @@ When generating or editing core-dependent code:
 	•	Do not add background loops unless explicitly allowed by a layer contract.
 	•	Preserve backward compatibility unless explicitly asked to break it.
 	•	If docs and source disagree, follow source code and record the mismatch.
-

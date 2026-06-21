@@ -1,59 +1,17 @@
-import { _x, _xlog, XNode, _xai } from "@xpell/node";
-import { MockProvider } from "@xpell/xai-providers/mock";
-import { AzureProvider } from "@xpell/xai-providers/azure";
+import { _x, _xlog, XNode, _xai,_xs,_xem } from "@xpell/node";
+import { AimeProvider } from "@xpell/xai-providers/aime";
 import "dotenv/config";
-// import { VibeAIEngineModule } from "./modules/vibe-ai/VibeAIEngineModule.js";
-import { XStudioModule } from "./modules/vibe/XStudioModule.js";
+
 import { XTestModule } from "./modules/Test/XTest.js";
 
-
+import {MusicPlayer} from "./modules/Test/MusicPlayer.js"
 
 function is_plain_object(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-// async function bootstrap_default_app() {
-//   const create_result = await _x.execute({
-//     _module: "server-xvm",
-//     _op: "create_app",
-//     _params: {
-//       _app_id: "vibe-app",
-//       _env: "default",
-//       _name: "Vibe App",
-//       _entry_view_id: "main",
-//     },
-//   } as any);
 
-//   const created =
-//     is_plain_object(create_result) && create_result._created === true;
-
-//   if (!created) {
-//     return;
-//   }
-
-//   await _x.execute({
-//     _module: "server-xvm",
-//     _op: "push_update",
-//     _params: {
-//       _app_id: "vibe-app",
-//       _env: "default",
-//       _view_id: "main",
-//       _view: {
-//         _id: "main",
-//         _type: "view",
-//         _children: [
-//           {
-//             _id: "main_label",
-//             _type: "label",
-//             _text: "Hello Vibe 🚀",
-//           },
-//         ],
-//       },
-//     },
-//   } as any);
-
-//   _xlog.log("[bootstrap] created default server-xvm app");
-// }
+const work_folder = process.env.WORK_FOLDER || "./work";
 
 async function main() {
   try {
@@ -62,39 +20,46 @@ async function main() {
     const node = new XNode();
 
     await node.start({
-      _work_folder: "./work",
+      _work_folder: work_folder,
       _system_xapps_path: "./system-xapps",
-      _web_settings: {
-        domain: "localhost",
-        "http-port": 3000,
-        "enable-wormhole": true
-      },
+      // _web_settings: {
+      //   domain: "localhost",
+      //   "http-port": 3000,
+      //   "enable-wormhole": true
+      // },
       _xdb: {
         _type: "fs"
       },
     });
 
-    await _x.loadModuleAsync(new XStudioModule());
-    await _x.loadModuleAsync(new XTestModule());
-    // await bootstrap_default_app();
+    const apiKey =
+      _xs.getPath(
+        "xai.providers.aime.api_key"
+      ) ||
+      process.env.AIME_API_KEY ||
+      "";
+
+    
     _xai.registerProvider(
-      "azure",
-      new AzureProvider({
-        endpoint: process.env.AZURE_OPENAI_ENDPOINT!,
-        apiKey: process.env.AZURE_OPENAI_API_KEY!,
-        deployment: process.env.AZURE_OPENAI_DEPLOYMENT!,
+      "aime",
+      new AimeProvider({
+        endpoint: process.env.AIME_ENDPOINT!,
+        apiKey
       })
     );
 
     await _x.execute({
       _module: "xai",
       _op: "set_default",
-      _params: { _provider: "azure" },
+      _params: { _provider: "aime" },
     });
 
+
+    await _x.loadModuleAsync(new XTestModule());
+    await _x.loadModuleAsync(new MusicPlayer(work_folder));
+    
+
     _xlog.log("[vibe-server] ready");
-    
-    
 
   } catch (err) {
     _xlog.error("[vibe-server] fatal", err);

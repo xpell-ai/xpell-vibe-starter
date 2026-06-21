@@ -1,0 +1,11 @@
+{
+  "_app_id": "dashboard-starter",
+  "_env": "default",
+  "_title": "Dashboard Starter",
+  "_system": false,
+  "_readonly": false,
+  "_version": 1,
+  "_meta": {
+    "_entry_view_id": "main"
+  }
+}
