@@ -15,7 +15,17 @@ import "@xpell/ui/xui.css";
 import "@xpell/xdashboard/xdashboard.css"
 import "./style/xvibe-app.css";
 
+
 type XRuntimeMode = "runtime" | "build" | "system";
+
+
+const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+const WORMHOLE_URL =
+  import.meta.env.VITE_WORMHOLE_URL ??
+  `${window.location.protocol === "https:" ? "wss" : "ws"}://${window.location.host}/wh/v2`;
+
 
 let _studio_listener_registered = false;
 
@@ -230,6 +240,8 @@ function registerStudioListeners(client: any) {
   );
 }
 
+
+
 const main = async () => {
   try {
     _x._verbose = true;
@@ -254,7 +266,7 @@ const main = async () => {
     const client = await XUIRuntime.loadApp({
       _app_id: app_id,
       _env: "default",
-      _wormhole_url: "ws://localhost:3000/wh/v2",
+      _wormhole_url:WORMHOLE_URL,
       _theme: "dark",
 
       onViewRendered: (view_id) => {

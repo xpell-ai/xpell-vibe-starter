@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@xpell/node": "^2.0.3",
-    "@xpell/xai-providers": "^2.0.3",
+    "@xpell/xai-providers": "^2.0.4",
     "dotenv": "^17.4.2"
   },
   "devDependencies": {

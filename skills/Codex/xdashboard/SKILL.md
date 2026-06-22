@@ -1,328 +1,298 @@
 ---
 name: XDashboard Contract
 id: xdashboard
-version: 1.1.0
-updated: 2026-05-24
+version: 1.2.0
+updated: 2026-06-22
 description: >
-  Dashboard UI object pack for Xpell UI. Exposes XDashPack/XDashboardPack as the public API,
-  registers dashboard-oriented XUIObject classes, ships a single CSS artifact,
-  and supports runtime-generated skills through _x.getSkills().
+  Dashboard UI object pack for Xpell UI. Use this skill when generating or
+  editing XUI JSON views that should use @xpell/xdashboard semantic objects,
+  especially admin dashboards such as the Xpell Dev Console.
 requires:
   - xpell-contract
   - xpell-core
   - xpell-ui
 ---
-## 1) Applies to / Scope
+
+## Applies To / Scope
 - Package: `@xpell/xdashboard`.
 - Public entrypoint: `src/index.ts`.
-- Public subpath export: `./xdashboard.css`.
-- Scope of this contract:
-  - `XDashPack`
-  - `XDashboardPack`
-  - objects registered in `XDashPack.getObjects()`
-  - dashboard component skills generated through runtime skill sync.
-- Non-scope:
-  - local demo/test files
-  - server modules
-  - transport logic
-  - app bootstrap templates
-## 2) Core identity
-- `@xpell/xdashboard` is a UI object pack.
-- It registers dashboard components implemented as `XUIObject` subclasses.
-- It is browser-oriented UI/runtime code.
-- It is not a server package.
-- It is not a data service.
-- It is not a transport layer.
-- It is not an app template entrypoint.
-## 3) Public API
-Root export:
-```ts
-export { XDashPack };
-export { XDashPack as XDashboardPack };
+- Public CSS export: `@xpell/xdashboard/xdashboard.css`.
+- Public objects are registered by `XDashPack.getObjects()` in `src/xcomp.ts`.
+- Root import exports only `XDashPack` and `XDashboardPack`.
+- This skill is for generated XUI dashboard JSON, component docs, and xdashboard code changes.
 
-CSS export:
+## When To Use XDashboard
+Use `@xpell/xdashboard` when a generated XUI view is a dashboard, console, admin panel, data management surface, settings view, usage/billing screen, API key screen, model/provider management screen, or any workflow that needs structured navigation, sections, KPI metrics, tables, filters, form fields, overlays, or feedback.
 
-import "@xpell/xdashboard/xdashboard.css";
+Do not build admin dashboards from generic `view`, `stack`, `xhtml`, or raw styled objects when an xdashboard semantic object exists. Use generic layout only when there is no matching dashboard object.
 
-Intended usage:
+Recommended mapping:
+- `sidebar`: app menu / navigation.
+- `xsection`: page sections.
+- `card`: panels, forms, grouped content.
+- `kpi-card`: metrics such as requests, tokens, credits, provider cost.
+- `table`: API keys, usage events, model prices.
+- `field`: form field wrapper.
+- `igroup`: grouped form/filter rows.
+- `toolbar`: navbars and action rows.
+- `badge`: status labels.
+- `divider`: visual separation.
+- `empty`: no data yet.
+- `toast`: feedback.
+- `scroll`: long dashboard content.
 
-import { _x } from "@xpell/core";
-import { XUI } from "@xpell/ui";
-import { XDashPack } from "@xpell/xdashboard";
-import "@xpell/xdashboard/xdashboard.css";
-await _x.start();
-await _x.loadModule(XUI);
-await _x.loadObjectPack(XDashPack);
+## Preferred Dashboard Layout
+For admin dashboards, prefer this composition:
 
-4) Authoritative registry
+1. A root `view` or app shell that owns the page layout.
+2. A persistent `sidebar` with a `navlist` for app navigation.
+3. A main content region with a top `toolbar`.
+4. A `scroll` container for long content.
+5. One or more `xsection` objects for page sections.
+6. A responsive `grid` with `_min_col_width` for KPI rows and card groups.
+7. `card`, `kpi-card`, `table`, `field`, and `igroup` inside sections.
+8. `drawer`, `modal`, and `toast` only for secondary panels, focused dialogs, and feedback.
 
-The authoritative dashboard registry is:
+Use `_children` for composition. Prefer `grid._min_col_width` for responsive dashboards. Prefer `stack._gap`, `grid._gap`, `toolbar._gap`, and `igroup._gap` over fixed `spacer` objects for normal spacing.
 
-XDashPack.getObjects()
+## Component Selection Guide
+- Navigation shell: `sidebar` with `_nav: { _type: "navlist" }`.
+- Page grouping: `xsection`, not generic `view`, when the content has a section title/actions.
+- Panel or grouped content: `card`.
+- Metrics: `kpi-card`.
+- Tabular records: `table`.
+- Status/counters: `badge`.
+- Forms: `field` around one control; `igroup` for related controls.
+- Search/filter control: `search` and `xselect`.
+- Action/filter row: `toolbar`.
+- Overflow content: `scroll`.
+- No records/results: `empty`.
+- Side detail/settings panel: `drawer`.
+- Confirmation/form overlay: `modal`.
+- Save/error feedback: `toast`.
+- Separation: `divider`.
+- Simple flex grouping: `stack`.
+- Intentional fixed blank space only: `spacer`.
 
-Documentation must not invent undocumented _type names.
+## Authoritative Type Names
+The runtime `_type` must equal the class `static _xtype` and the registry key in `XDashPack.getObjects()`.
 
-Every registered component must obey:
-
-static _xtype === XDashPack.getObjects() key === generated JSON _type
-
-5) Registered dashboard object types
-
-Current dashboard object types:
-
-* card
-* grid
-* navlist
-* badge
-* table
-* modal
-* toast
-* divider
-* stack
-* kpi-card
-* scroll
-* spacer
-* toolbar
-* empty
-* igroup
-* search
-* xselect
-* field
-* drawer
-* sidebar
-* xsection
+Current registered `_type` values:
+- `card`
+- `grid`
+- `navlist`
+- `badge`
+- `table`
+- `modal`
+- `toast`
+- `divider`
+- `stack`
+- `kpi-card`
+- `scroll`
+- `spacer`
+- `toolbar`
+- `empty`
+- `igroup`
+- `search`
+- `xselect`
+- `field`
+- `drawer`
+- `sidebar`
+- `xsection`
 
 Important naming rules:
+- Use `_type: "xselect"`, not `select`, for xdashboard styled selects.
+- Use `_type: "xsection"`, not `section`, for xdashboard sections.
+- Use `_type: "empty"`, not `empty-state`.
+- Use `_type: "igroup"`, not `input-group`.
+- Do not generate names like `x-card`, `x-grid`, `x-stack`, or `x-kpi-card`.
 
-* Use xselect, not select, because XUI core may own native/core select behavior.
-* Use xsection, not section, because XUI core / XHTML aliases may use section as an HTML tag.
-* Do not generate names like x-card, x-grid, x-stack, or x-kpi-card.
+## Styling Rules
+Import the bundled stylesheet once:
 
-6) Component construction pattern
+```ts
+import "@xpell/xdashboard/xdashboard.css";
+```
 
-Dashboard components should follow this pattern:
+Use existing classes and component props from the app CSS. Do not generate huge inline style-sheet objects unless explicitly requested. Small `style` values are acceptable when the implementation supports a CSS variable or size field such as `_width`, `_max_height`, `_max_width`, `_gap`, `_top`, `_length`, `_inset`, `_cols`, or `_min_col_width`.
 
-export class XSomething extends XUIObject {
-  static _xtype = "something";
-  static _skill: XpellSkill = {
-    _id: "something",
-    _type: "view-skill",
-    _requires: ["xuiobject"]
-  };
-  constructor(data: XSomethingData) {
-    const defaults = {
-      _type: XSomething._xtype,
-      class: "xsomething",
-      _html_tag: "div"
-    };
-    super(data, defaults, true);
-    this.parse(data);
-  }
-}
+Each component applies its base CSS class automatically, for example `xcard`, `xgrid`, `xtable`, `xfield`, `xsidebar`, and `xsection`. Add `class` only for existing app-specific classes or documented CSS variants. Do not invent a parallel design system, Tailwind classes, Bootstrap classes, or raw HTML documents.
 
-Common rules:
+## Data Binding And Events
+- `table` supports `_data_source`, `_rows` as an array, and `_rows` as an XData key. It also has `_on_data`.
+- `field` can pass `_data_output` and `_update_data_source_event` from the field object to its `_control` when the control does not already define them.
+- `xselect` supports `_on_change`; generated/persisted JSON should use a data-only command object, not a JavaScript function. The selected value is passed as `$data` by implementation.
+- `search`, `navlist`, `modal`, `toast`, `drawer`, and `sidebar` have runtime callback fields in TypeScript, but generated/persisted JSON must not contain JavaScript functions.
+- Action-bearing fields such as `_actions`, `_action`, table action columns, and `_footer` accept child XUI objects. Prefer `_id` on interactive objects so client logic can address them.
 
-* Extend XUIObject.
-* Use static _xtype.
-* Keep _xtype, registry key, and skill _id aligned.
-* Use super(data, defaults, true).
-* Call this.parse(data).
-* Use private __* fields for component-local runtime state.
-* Keep component state explicit and synchronized through setters/methods.
+For generated dashboards:
+- Do not invent client ops.
+- Do not invent handler names.
+- Do not generate JavaScript functions.
+- Preserve existing `_data_source`, `_rows`, `_data_output`, `_on_data`, and other bindings when editing views.
+- Use Nano-Commands/data-only handlers only when the target runtime already supports the op.
 
-7) Skills contract
+## Anti-Hallucination Rules
+- Do not invent fields not supported by the implementation.
+- Do not invent `_type` names.
+- Do not invent `_xtype` names.
+- Do not invent client ops.
+- Do not rename `xselect` to `select` or `xsection` to `section`.
+- Do not turn implementation-only callbacks into persisted JavaScript.
+- Do not replace semantic xdashboard objects with generic `view` or `stack` when a semantic object exists.
+- Do not remove or rewrite data sources and bindings unless the user explicitly asks.
+- Prefer `_id` on interactive objects, tables, forms, drawers, modals, toasts, and navigation objects.
 
-Dashboard components should expose runtime skills using:
+## Xpell Dev Console Notes
+- API key table data source: `xai:keys`.
+- API key creation op: `xai-router-client.create-api-key`.
+- Auth user data source: `auth:user`.
+- Admin-only features should be hidden or gated by client logic.
+- Use `kpi-card` for requests, tokens, credits, and provider cost.
+- Use `table` for API keys, usage events, and model prices.
+- Use `field` and `xselect` inside `card` or `modal` for create/edit forms.
 
-static _skill: XpellSkill
-
-Runtime skill sync is the source of truth:
-
-_x.getSkills()
-→ xvibe.sync-skills
-→ VibeKnowledgeSelector
-→ prompt builder
-
-Static KB JSON files are guidance-only and are not the source of truth.
-
-Rules:
-
-* Component skills describe only the component’s own fields and own behavior.
-* Use _requires to point to inherited/base capabilities.
-* Do not duplicate inherited fields or inherited nano commands.
-* Object skills export only own nano commands.
-* Inherited nano commands are resolved through _requires chains.
-* _requires must point to skills available in the runtime skill registry.
-* Runtime-generated skills should replace manual component lists where possible.
-
-8) Data + state contract
-
-Package-level shared state: none.
-
-Component-local state:
-
-* private __* fields are allowed.
-* setters/methods must keep DOM/layout in sync.
-* no hidden global state.
-* no hidden shared state mirrors.
-
-XData usage:
-
-* Use explicit _data_source / _on_data only where implemented.
-* XTable supports _data_source and _on_data.
-* XTable may resolve _rows from an XData key.
-* New components must not use _xd._o[...] for new writes.
-* Do not use XData as persistence.
-
-9) Events + handlers
-
-Runtime/local handlers may support functions internally.
-
-Persisted/generated Vibe JSON must be data-only.
-
-Hard rule:
-
-Persisted/generated XUI JSON MUST NOT contain JavaScript functions.
-
-Allowed persisted handler forms:
-
-{ "_op": "set-field", "_params": { "name": "_open", "value": true } }
-
-or sequences:
-
-[
-  { "_op": "set-field", "_params": { "name": "_open", "value": true } },
-  { "_op": "log", "_params": { "1": "opened" } }
-]
-
-Rules:
-
-* For generated dashboards, use Nano-Commands v2 only.
-* Do not generate function handlers such as _on_click: () => {}.
-* Function handlers are allowed only for runtime-authored/internal component wiring.
-* If a component interface contains _on_change, _on_input, _on_open, _on_close, _on_toggle, etc., these must not be exposed as JS functions in persisted/generated JSON.
-
-10) Styling / theming
-
-Styling is token-driven.
-
-Use:
-
-var(--x-*)
-
-Prefer semantic dashboard fields:
-
-_variant
-_tone
-_size
-_density
-_elevation
-_theme
-
-Avoid raw:
-
-class
-style
-
-unless explicitly requested or required for a low-level escape hatch.
-
-Rules:
-
-* Component styles should be class-based and token-driven.
-* Keep compatibility with bundled xdashboard.css.
-* Do not generate Tailwind, Bootstrap, CSS files, or HTML documents for dashboard views.
-* Prefer semantic fields and dashboard components over raw layout.
-
-11) Layout guidance for Vibe
-
-Preferred layout primitives:
-
-* stack for simple vertical/horizontal layout.
-* grid for responsive multi-column layouts.
-* xsection for dashboard page sections.
-* card for content summaries.
-* kpi-card for metrics.
-* toolbar for actions and filters.
-* field for form controls.
-* drawer, modal, toast for overlays/feedback.
-* sidebar + navlist for navigation.
-
-Guidance:
-
-* Use _children arrays for composition.
-* Prefer concrete XUI wrappers over xhtml when a wrapper exists.
-* Use xhtml only for real HTML tags when no wrapper exists.
-* Prefer grid._min_col_width for responsive dashboards.
-* Prefer stack._gap over spacer for normal layout spacing.
-* Use spacer only for intentional fixed blank space.
-
-12) Performance rules
-
-* No setInterval.
-* No polling loops.
-* No unbounded retries.
-* Avoid setTimeout.
-* If a one-shot timer is required, it must be bounded, cancelable, and documented.
-* XToast auto-close should remain frame-driven through onFrame.
-* Components should avoid re-entrant update loops.
-* Data refresh should be explicit and event/data-driven.
-
-13) Hard forbiddens
-
-* Do not introduce new dashboard _type values without:
-    * adding a class
-    * setting static _xtype
-    * registering it in XDashPack.getObjects()
-    * adding/updating its skill
-* Do not add React, Vue, Svelte, Angular, JSX, hooks, or virtual DOM.
-* Do not add server/runtime transport logic.
-* Do not add fetch/websocket/service layers inside dashboard components.
-* Do not bypass XUIObject lifecycle with unmanaged DOM mutations.
-* Do not persist JS functions in generated views.
-* Do not generate raw HTML documents.
-* Do not use Tailwind/Bootstrap as the layout system.
-* Do not expose new public API symbols without updating src/index.ts and package exports.
-
-14) Minimal JSON example
-
+## Canonical Admin Dashboard Skeleton
+```json
 {
   "_type": "view",
-  "_id": "main",
-  "_theme": "dark",
+  "_id": "xdev-console-shell",
+  "class": "xdev-console-shell",
   "_children": [
     {
       "_type": "sidebar",
-      "_title": "Dashboard",
+      "_id": "xdev-sidebar",
+      "_title": "Xpell Dev Console",
+      "_subtitle": "Admin",
+      "_scroll": true,
+      "_dividers": true,
       "_nav": {
         "_type": "navlist",
+        "_id": "xdev-nav",
+        "_active": "api-keys",
         "_items": [
-          { "_label": "Home", "_value": "home" },
-          { "_label": "Reports", "_value": "reports" }
-        ],
-        "_active": "home"
+          { "_label": "Overview", "_value": "overview" },
+          { "_label": "API Keys", "_value": "api-keys" },
+          { "_label": "Usage", "_value": "usage" },
+          { "_label": "Model Prices", "_value": "model-prices" }
+        ]
       }
     },
     {
-      "_type": "xsection",
-      "_title": "Overview",
-      "_subtitle": "Live business metrics",
+      "_type": "scroll",
+      "_id": "xdev-main-scroll",
+      "_direction": "vertical",
+      "_grow": true,
       "_children": [
         {
-          "_type": "grid",
-          "_min_col_width": 240,
-          "_gap": 16,
+          "_type": "toolbar",
+          "_id": "xdev-topbar",
+          "_justify": "space-between",
+          "_align": "center",
+          "_children": [
+            { "_type": "label", "_text": "API Keys" },
+            {
+              "_type": "button",
+              "_id": "create-api-key-button",
+              "_text": "Create key"
+            }
+          ]
+        },
+        {
+          "_type": "xsection",
+          "_id": "usage-summary-section",
+          "_title": "Usage summary",
           "_children": [
             {
-              "_type": "kpi-card",
-              "_label": "Users",
-              "_value": "1,204",
-              "_delta": "+8%",
-              "_delta_state": "up"
-            },
+              "_type": "grid",
+              "_id": "usage-kpis",
+              "_min_col_width": 220,
+              "_gap": 16,
+              "_children": [
+                {
+                  "_type": "kpi-card",
+                  "_id": "requests-kpi",
+                  "_label": "Requests",
+                  "_value": "0",
+                  "_delta_state": "flat"
+                },
+                {
+                  "_type": "kpi-card",
+                  "_id": "tokens-kpi",
+                  "_label": "Tokens",
+                  "_value": "0",
+                  "_delta_state": "flat"
+                },
+                {
+                  "_type": "kpi-card",
+                  "_id": "credits-kpi",
+                  "_label": "Credits",
+                  "_value": "0",
+                  "_delta_state": "flat"
+                },
+                {
+                  "_type": "kpi-card",
+                  "_id": "provider-cost-kpi",
+                  "_label": "Provider cost",
+                  "_value": "$0.00",
+                  "_delta_state": "flat"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "_type": "xsection",
+          "_id": "api-keys-section",
+          "_title": "API keys",
+          "_actions": [
+            {
+              "_type": "badge",
+              "_id": "api-key-status-badge",
+              "_text": "Admin",
+              "_variant": "info"
+            }
+          ],
+          "_children": [
             {
               "_type": "card",
-              "_title": "Revenue",
-              "_text": "$12,000"
+              "_id": "create-api-key-card",
+              "_title": "Create key",
+              "_text": "Generate a scoped API key for this workspace.",
+              "_hide_image": true,
+              "_actions": [
+                {
+                  "_type": "button",
+                  "_id": "create-api-key-action",
+                  "_text": "Create key"
+                }
+              ]
+            },
+            {
+              "_type": "field",
+              "_id": "api-key-name-field",
+              "_label": "Key name",
+              "_required": true,
+              "_control": {
+                "_type": "text",
+                "_id": "api-key-name-input",
+                "placeholder": "Production key",
+                "_data_output": "apiKeyForm.name"
+              }
+            },
+            {
+              "_type": "table",
+              "_id": "api-keys-table",
+              "_data_source": "xai:keys",
+              "_row_key": "id",
+              "_columns": [
+                { "_key": "name", "_title": "Name" },
+                { "_key": "createdAt", "_title": "Created" },
+                { "_key": "status", "_title": "Status" }
+              ],
+              "_empty_text": "No API keys yet",
+              "_hover": true,
+              "_bordered": true
             }
           ]
         }
@@ -330,3 +300,10 @@ Guidance:
     }
   ]
 }
+```
+
+Wire the create action to `xai-router-client.create-api-key` only in client logic that already supports that op. Do not invent an `_on_click`, `_client_op`, or `_flow` shape unless the project already uses it.
+
+## References
+- Component field map: `SKILL_API_MAP.md`.
+- Generation checklist: `SKILL_CHECKLIST.md`.
