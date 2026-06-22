@@ -1,8 +1,8 @@
 services:
-  xai-router:
+  xpell-vibe:
     build:
       context: .
-    container_name: xai-router
+    container_name: xpell-vibe
     restart: unless-stopped
     env_file:
       - ./server/.env
