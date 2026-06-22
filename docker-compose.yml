@@ -1,0 +1,18 @@
+services:
+  xai-router:
+    build:
+      context: .
+    container_name: xai-router
+    restart: unless-stopped
+    env_file:
+      - ./server/.env
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./server/work:/app/server/work
+    networks:
+      - xpell-net
+
+networks:
+  xpell-net:
+    external: true
