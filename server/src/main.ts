@@ -4,11 +4,6 @@ import "dotenv/config";
 
 import { XTestModule } from "./modules/Test/XTest.js";
 
-import {MusicPlayer} from "./modules/Test/MusicPlayer.js"
-
-function is_plain_object(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
 
 
 const work_folder = process.env.WORK_FOLDER || "./work";
@@ -56,7 +51,6 @@ async function main() {
 
 
     await _x.loadModuleAsync(new XTestModule());
-    await _x.loadModuleAsync(new MusicPlayer(work_folder));
     
 
     _xlog.log("[vibe-server] ready");
